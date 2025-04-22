@@ -35,19 +35,30 @@ Pada tahap ini, dilakukan klarifikasi terhadap permasalahan yang akan diselesaik
 
 Masalah utama yang menjadi fokus dalam study kasus ini adalah sebagai berikut:
 
-1. **Memprediksi hasil panen berdasarkan faktor lingkungan dan input pertanian** karena hasil panen tanaman dipengaruhi oleh sejumlah faktor eksternal, di antaranya adalah curah hujan, suhu rata-rata, dan penggunaan pestisida. Ketidakpastian terhadap pengaruh dari faktor-faktor tersebut terhadap hasil pertanian seringkali menyulitkan petani dalam merencanakan produksi pertanian mereka. Oleh karena itu, dibutuhkan model prediktif yang dapat memproyeksikan hasil panen berdasarkan data yang tersedia, untuk memberikan gambaran yang lebih jelas tentang potensi hasil yang dapat diperoleh.
+1. Kelebihan atau kekurangan suplai pangan ketika prediksi hasil panen tidak akurat, bisa terjadi kekurangan atau kelebihan pasokan yang mempengaruhi harga pangan.
 
-3. **Mengidentifikasi faktor-faktor yang paling berpengaruh terhadap hasil panen**. Selain prediksi hasil panen, sangat penting untuk memahami faktor-faktor lingkungan dan input pertanian yang memiliki dampak signifikan terhadap hasil panen. Identifikasi faktor-faktor ini dapat memberikan wawasan yang berguna dalam perencanaan dan pengelolaan sumber daya pertanian secara lebih efektif.
+2. Perencanaan distribusi yang buruk tanpa prediksi yang tepat akan menyebabkan distribusi pangan dapat terhambat atau tidak merata, merugikan petani dan konsumen.
+   
+3. Kesalahan dalam kebijakan pangan nasional seperti kebijakan subsidi, impor-ekspor, dan distribusi bantuan pangan yang tidak berbasis data dapat menyebabkan ketidakefektifan dalam pengelolaan sektor pertanian.
+
+Untuk itu, sangat penting bagi pemangku kepentingan di sektor pertanian untuk memiliki model prediktif yang dapat memproyeksikan hasil panen secara lebih akurat berdasarkan data historis dan faktor lingkungan yang ada.
 
 ### Goals
 
-Tujuan yang ingin dicapai dalam study kasus ini adalah sebagai berikut:
+Tujuan utama dari proyek ini adalah membangun model prediktif yang dapat membantu memproyeksikan hasil panen berdasarkan faktor-faktor yang memengaruhinya, seperti curah hujan, suhu, dan penggunaan pestisida. Beberapa sasaran utama dari proyek ini adalah:
 
-1. **Membangun model prediktif untuk hasil panen** yang dapat memproyeksikan hasil panen dengan akurasi yang baik. Model ini akan menggunakan data historis yang mencakup variabel-variabel seperti curah hujan, suhu, penggunaan pestisida, dan lainnya, untuk menghasilkan prediksi yang dapat membantu para petani dalam merencanakan strategi pertanian mereka.
+1. Memprediksi hasil panen secara akurat untuk berbagai jenis tanaman dan wilayah berdasarkan data historis. Model ini akan menggunakan data historis yang mencakup variabel-variabel seperti curah hujan, suhu, penggunaan pestisida, dan lainnya, untuk menghasilkan prediksi yang dapat membantu para petani dalam merencanakan strategi pertanian mereka.
 
-2. **Menilai pengaruh faktor lingkungan dan input pertanian terhadap hasil panen** untuk mengeksplorasi dan menganalisis faktor-faktor yang paling berpengaruh terhadap hasil panen. Dengan mengetahui faktor mana yang memiliki dampak terbesar, diharapkan para pemangku kepentingan dapat mengambil kebijakan yang lebih tepat dalam mengelola sektor pertanian.
+2. Mengidentifikasi faktor-faktor yang paling berpengaruh terhadap hasil panen. Dengan mengetahui faktor mana yang memiliki dampak terbesar, diharapkan para pemangku kepentingan dapat mengambil kebijakan yang lebih tepat dalam mengelola sektor pertanian.
 
-### Solution Statement
+### Metodologi
+Masalah yang akan diselesaikan dalam proyek ini adalah regresi, karena hasil panen yang diprediksi merupakan variabel kontinu. Oleh karena itu, model yang akan dibangun adalah model regresi yang memprediksi hasil panen dalam satuan hektogram per hektar (hg/ha) berdasarkan data historis yang mencakup berbagai fitur, seperti:
+
+- Curah hujan tahunan (mm per tahun)
+
+- Suhu rata-rata tahunan (°C)
+
+- Penggunaan pestisida (ton)
 
 Untuk mencapai tujuan tersebut, beberapa solusi yang diusulkan dalam merancang model prediksi ini adalah sebagai berikut:
 
@@ -55,7 +66,13 @@ Untuk mencapai tujuan tersebut, beberapa solusi yang diusulkan dalam merancang m
 
 2. **Optimalisasi model melalui hyperparameter tuning** untuk meningkatkan performa model yang digunakan. Tahap **hyperparameter tuning** akan dilakukan guna mencari kombinasi parameter yang memberikan hasil terbaik. Proses ini diharapkan dapat meningkatkan akurasi prediksi dan memperbaiki kelemahan yang mungkin ada pada model dasar.
 
-3. **Evaluasi dan pemilihan model terbaik** dengan melakukan pengujian terhadap model, performa masing-masing model akan dievaluasi menggunakan metrik yang relevan, seperti **Root Mean Squared Error (RMSE)** atau **R-squared (R²)**. Model dengan performa terbaik berdasarkan hasil evaluasi akan dipilih sebagai solusi akhir yang dapat digunakan untuk memprediksi hasil panen.
+### Metrik Evaluasi
+
+**Evaluasi dan pemilihan model terbaik** dengan melakukan pengujian terhadap model, performa masing-masing model akan dievaluasi menggunakan metrik yang relevan untuk mengevaluasi seberapa baik model memprediksi hasil panen, beberapa metrik evaluasi yang digunakan adalah:
+
+- Root Mean Square Error (RMSE) untuk mengukur rata-rata kesalahan prediksi dalam satuan yang sama dengan data asli.
+
+- R-squared (R²) untuk mengukur seberapa baik variabilitas data dapat dijelaskan oleh model.
 
 Dengan pendekatan ini, diharapkan dapat dicapai prediksi hasil panen yang lebih akurat dan dapat memberikan informasi yang lebih jelas bagi para petani dalam merencanakan kegiatan pertanian mereka, serta memberikan wawasan yang berguna bagi pengambilan keputusan dalam pengelolaan sektor pertanian secara lebih efisien dan berkelanjutan.
 
