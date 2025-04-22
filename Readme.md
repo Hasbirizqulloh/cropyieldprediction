@@ -1,25 +1,30 @@
 ## Domain Proyek
 
-Pertanian merupakan sektor vital dalam kehidupan manusia, karena menyediakan kebutuhan pangan dan bahan baku industri. Namun, hasil panen tanaman sangat dipengaruhi oleh berbagai faktor lingkungan seperti curah hujan, suhu udara, serta penggunaan pestisida. Variasi dari faktor-faktor ini dapat menyebabkan ketidakpastian dalam hasil pertanian, yang pada akhirnya berdampak pada ketahanan pangan dan stabilitas ekonomi, terutama di negara-negara berkembang.
+Pertanian merupakan sektor fundamental dalam menopang kebutuhan hidup manusia, terutama dalam penyediaan bahan pangan dan bahan baku industri. Di banyak negara, khususnya negara berkembang, pertanian juga menjadi sumber utama pendapatan masyarakat dan berperan penting dalam menjaga stabilitas ekonomi nasional. Oleh karena itu, produktivitas pertanian menjadi faktor yang sangat krusial dalam mendukung ketahanan pangan dan pembangunan berkelanjutan.
 
-Salah satu cara untuk mengurangi ketidakpastian ini adalah dengan memanfaatkan teknologi *machine learning* untuk memprediksi hasil panen berdasarkan data historis dan kondisi lingkungan. Dengan model prediktif yang akurat, petani dan pemangku kebijakan dapat mengambil keputusan yang lebih tepat dalam pengelolaan lahan, penggunaan sumber daya, dan perencanaan produksi.
+Namun, hasil panen tidak selalu stabil dari tahun ke tahun. Perubahan kondisi lingkungan, seperti curah hujan, suhu udara, serta penggunaan pestisida, dapat memengaruhi hasil produksi pertanian. Ketidakpastian akibat variasi faktor-faktor ini sering menjadi kendala utama dalam pengelolaan lahan dan perencanaan pertanian yang efektif. Dampaknya tidak hanya dirasakan oleh petani secara langsung, tetapi juga pada rantai pasok pangan secara keseluruhan.
 
-Pada proyek ini, digunakan dataset berjudul **Crop Yield Prediction Dataset** yang terdiri dari 28.242 entri dan mencakup variabel-variabel seperti:
-- Area (negara),
-- Jenis tanaman,
-- Tahun,
-- Hasil panen (hg/ha),
-- Curah hujan rata-rata (mm/tahun),
-- Jumlah penggunaan pestisida (ton),
-- Temperatur rata-rata tahunan (°C).
+Kemajuan teknologi dalam bidang analisis data dan kecerdasan buatan kini membuka peluang untuk mengatasi tantangan tersebut. Salah satu pendekatan yang banyak dikembangkan adalah penerapan machine learning untuk memprediksi hasil panen berdasarkan data historis dan faktor lingkungan. Dengan membangun model prediktif yang andal, informasi seperti rata-rata curah hujan tahunan, suhu udara, serta penggunaan pestisida dapat dianalisis untuk memperkirakan hasil produksi secara lebih akurat. Hasil prediksi ini dapat digunakan oleh petani, peneliti, maupun pembuat kebijakan sebagai dasar dalam pengambilan keputusan strategis yang lebih tepat sasaran dan adaptif terhadap perubahan kondisi lingkungan.
 
-### Mengapa Masalah Ini Perlu Diselesaikan?
+### Mengapa dan Bagaimana Masalah Ini Harus Diselesaikan
 
-- **Ketidakpastian Hasil Panen**: Petani sering menghadapi tantangan dalam memprediksi hasil panen yang dipengaruhi oleh kondisi cuaca dan input pertanian.
-- **Optimalisasi Sumber Daya**: Prediksi hasil panen membantu dalam mengatur penggunaan pupuk, air, pestisida, dan waktu tanam.
-- **Perencanaan dan Ketahanan Pangan**: Pemerintah dan organisasi pertanian dapat merencanakan distribusi pangan secara lebih efisien dan proaktif.
-- **Dampak Ekonomi**: Dengan meningkatkan efisiensi pertanian, pendapatan petani dapat meningkat dan ketergantungan terhadap impor pangan dapat berkurang.
+Fluktuasi hasil panen merupakan masalah krusial dalam sektor pertanian yang berdampak langsung terhadap **ketahanan pangan**, **kesejahteraan petani**, serta **stabilitas ekonomi** negara, terutama negara yang sangat bergantung pada agrikultur [1]. Faktor-faktor seperti **iklim yang tidak menentu**, **penggunaan pestisida**, **curah hujan**, dan **temperatur rata-rata** tahunan dapat memengaruhi hasil panen secara signifikan [2].
+
+Ketidakmampuan untuk memprediksi hasil panen secara akurat dapat menyebabkan:
+- **Kelebihan atau kekurangan suplai**, yang mempengaruhi harga pangan.
+- **Perencanaan distribusi yang buruk**, yang dapat menyebabkan kerugian bagi petani dan konsumen.
+- **Kesalahan strategi kebijakan pangan nasional**, seperti subsidi, ekspor-impor, dan distribusi bantuan.
+
+Oleh karena itu, penerapan machine learning menjadi solusi potensial karena kemampuannya dalam mengolah **data historis yang kompleks** untuk menghasilkan **prediksi yang lebih akurat**. Dengan membangun model prediktif berbasis data lingkungan dan penggunaan input pertanian, kita dapat membantu:
+
+1. **Petani** dalam mengambil keputusan operasional, seperti waktu tanam dan penggunaan pestisida.
+2. **Pemerintah** dalam merancang kebijakan dan perencanaan distribusi pangan.
+3. **Lembaga keuangan** dalam memberikan pinjaman atau asuransi berbasis prediksi hasil panen yang objektif.
+
+Implementasi solusi ini dilakukan melalui pendekatan regresi menggunakan data historis yang tersedia, kemudian membangun model prediktif dengan algoritma machine learning seperti **Random Forest**, **XGBoost**, dan **Linear Regression**. Evaluasi akan dilakukan menggunakan metrik seperti **R²** dan **Root Mean Square Error (RMSE)** untuk menilai akurasi model.
 
 ### Referensi
-- [Impact of climate change on crop yield](https://scholar.google.com/scholar?q=impact+of+climate+change+on+crop+yield)  
-- [Using machine learning to predict agricultural yields](https://scholar.google.com/scholar?q=using+machine+learning+to+predict+agricultural+yields)
+
+[1] FAO. (2019). *The State of Food Security and Nutrition in the World*.  
+[2] Lobell, D. B., et al. (2011). "Climate Trends and Global Crop Production Since 1980." *Science*, 333(6042), 616–620.  
+[3] You, J., et al. (2017). "Deep Gaussian Process for Crop Yield Prediction Based on Remote Sensing Data." *AAAI*.
