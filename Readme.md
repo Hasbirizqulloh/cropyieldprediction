@@ -33,23 +33,20 @@ Pada tahap ini, dilakukan klarifikasi terhadap permasalahan yang akan diselesaik
 
 ### Problem Statements
 
-Masalah utama yang menjadi fokus dalam study kasus ini adalah sebagai berikut:
+Masalah utama yang menjadi fokus dalam proyek ini adalah sebagai berikut:
 
-1. Kelebihan atau kekurangan suplai pangan ketika prediksi hasil panen tidak akurat, bisa terjadi kekurangan atau kelebihan pasokan yang mempengaruhi harga pangan.
+1. Hasil panen tanaman sangat dipengaruhi oleh sejumlah faktor eksternal seperti curah hujan, suhu udara rata-rata, dan penggunaan pestisida. Ketidakpastian terhadap pengaruh faktor-faktor tersebut menyulitkan petani dalam merencanakan produksi secara optimal. Oleh karena itu, diperlukan suatu pendekatan yang mampu memproyeksikan hasil panen secara akurat berdasarkan data historis dan kondisi lingkungan.
 
-2. Perencanaan distribusi yang buruk tanpa prediksi yang tepat akan menyebabkan distribusi pangan dapat terhambat atau tidak merata, merugikan petani dan konsumen.
-   
-3. Kesalahan dalam kebijakan pangan nasional seperti kebijakan subsidi, impor-ekspor, dan distribusi bantuan pangan yang tidak berbasis data dapat menyebabkan ketidakefektifan dalam pengelolaan sektor pertanian.
-
-Untuk itu, sangat penting bagi pemangku kepentingan di sektor pertanian untuk memiliki model prediktif yang dapat memproyeksikan hasil panen secara lebih akurat berdasarkan data historis dan faktor lingkungan yang ada.
+2. Tidak semua faktor lingkungan memiliki pengaruh yang sama terhadap hasil panen. Ketidaktahuan mengenai faktor-faktor dominan yang memengaruhi produktivitas pertanian dapat menyebabkan penggunaan sumber daya yang tidak efisien. Maka, dibutuhkan analisis yang dapat mengidentifikasi variabel mana yang paling signifikan dalam memengaruhi hasil panen.
 
 ### Goals
 
 Tujuan utama dari proyek ini adalah membangun model prediktif yang dapat membantu memproyeksikan hasil panen berdasarkan faktor-faktor yang memengaruhinya, seperti curah hujan, suhu, dan penggunaan pestisida. Beberapa sasaran utama dari proyek ini adalah:
 
-1. Memprediksi hasil panen secara akurat untuk berbagai jenis tanaman dan wilayah berdasarkan data historis. Model ini akan menggunakan data historis yang mencakup variabel-variabel seperti curah hujan, suhu, penggunaan pestisida, dan lainnya, untuk menghasilkan prediksi yang dapat membantu para petani dalam merencanakan strategi pertanian mereka.
+1. Membangun model prediktif berbasis machine learning untuk memperkirakan hasil panen (dalam satuan hg/ha) dengan akurasi tinggi. Model ini akan menggunakan data historis pertanian yang mencakup variabel lingkungan seperti curah hujan, suhu udara rata-rata, dan penggunaan pestisida sebagai input prediktor.
 
-2. Mengidentifikasi faktor-faktor yang paling berpengaruh terhadap hasil panen. Dengan mengetahui faktor mana yang memiliki dampak terbesar, diharapkan para pemangku kepentingan dapat mengambil kebijakan yang lebih tepat dalam mengelola sektor pertanian.
+2. Melakukan analisis terhadap kontribusi masing-masing variabel lingkungan dan input pertanian dalam memengaruhi hasil panen, sehingga dapat diidentifikasi faktor-faktor yang paling berpengaruh. Hasil analisis ini diharapkan dapat membantu pengambilan keputusan yang lebih tepat dalam perencanaan dan manajemen pertanian.
+
 
 ### Metodologi
 Masalah yang akan diselesaikan dalam proyek ini adalah regresi, karena hasil panen yang diprediksi merupakan variabel kontinu. Oleh karena itu, model yang akan dibangun adalah model regresi yang memprediksi hasil panen dalam satuan hektogram per hektar (hg/ha) berdasarkan data historis yang mencakup berbagai fitur, seperti:
