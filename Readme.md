@@ -73,4 +73,43 @@ Untuk mencapai tujuan tersebut, beberapa solusi yang diusulkan dalam merancang m
 
 Dengan pendekatan ini, diharapkan dapat dicapai prediksi hasil panen yang lebih akurat dan dapat memberikan informasi yang lebih jelas bagi para petani dalam merencanakan kegiatan pertanian mereka, serta memberikan wawasan yang berguna bagi pengambilan keputusan dalam pengelolaan sektor pertanian secara lebih efisien dan berkelanjutan.
 
+## Data Understanding
+
+Dataset yang digunakan dalam proyek ini berjudul **"Crop Yield Prediction Dataset"**, yang diperoleh dari platform [Kaggle](https://www.kaggle.com/datasets/mrigaankjaswal/crop-yield-prediction-dataset). Dataset ini terdiri dari **28.242 entri** dan mencakup data historis mengenai hasil pertanian serta beberapa variabel lingkungan dari berbagai negara. Data ini sangat relevan dalam konteks pengembangan model prediktif untuk estimasi hasil panen berbasis faktor lingkungan.
+
+### Deskripsi Fitur
+
+Dataset ini memiliki tujuh kolom utama, dengan penjelasan sebagai berikut:
+
+- **`Area (Country)`**  
+  Variabel kategorikal yang menunjukkan lokasi geografis (negara) dari data yang dicatat. Dapat digunakan sebagai fitur setelah dilakukan encoding.
+
+- **`Item`**  
+  Jenis produk pertanian atau komoditas, seperti gandum, jagung, dan sebagainya. Merupakan variabel kategorikal, bisa digunakan untuk klasifikasi spesifik komoditas.
+
+- **`Year`**  
+  Tahun pencatatan data (numerik). Digunakan untuk melihat tren temporal dan pengaruh waktu terhadap hasil panen.
+
+- **`hg/ha_yield`**  
+  Target atau label dari model, yaitu hasil panen dalam satuan hectogram per hektar (hg/ha). Variabel numerik kontinu.
+
+- **`average_rain_fall_mm_per_year`**  
+  Curah hujan rata-rata tahunan (dalam mm). Merupakan salah satu faktor utama dalam pertumbuhan tanaman.
+
+- **`pesticides_tonnes`**  
+  Total penggunaan pestisida dalam satuan ton. Pengaruhnya terhadap hasil panen bersifat kompleks.
+
+- **`avg_temp`**  
+  Rata-rata suhu udara tahunan (dalam °C). Faktor penting yang memengaruhi pertumbuhan dan hasil panen tanaman.
+
+### Eksplorasi Awal
+
+Beberapa langkah eksplorasi data yang dilakukan pada tahap awal untuk memahami karakteristik dataset:
+
+- Pemeriksaan distribusi nilai pada kolom target (`hg/ha_yield`).
+- Identifikasi nilai hilang (missing values) dan pencilan (outliers) pada fitur numerik.
+- Visualisasi hubungan antara fitur numerik seperti curah hujan, suhu, dan pestisida terhadap hasil panen menggunakan scatter plot dan heatmap korelasi.
+- Analisis tren hasil panen dari tahun ke tahun berdasarkan rata-rata yield nasional.
+
+Langkah-langkah eksplorasi ini memberikan wawasan awal yang penting sebagai dasar untuk proses persiapan data dan pembangunan model prediktif.
 
