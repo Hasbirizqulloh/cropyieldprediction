@@ -27,3 +27,36 @@ Implementasi solusi ini dilakukan melalui pendekatan regresi menggunakan data hi
 6. F. Lin et al., “MMST-ViT: Climate Change-aware Crop Yield Prediction via Multi-Modal Spatial-Temporal Vision Transformer,” Proc. IEEE Int. Conf. Comput. Vis., pp. 5751–5761, 2023, doi: 10.1109/ICCV51070.2023.00531.
 7. T. Ginbo, “Heterogeneous impacts of climate change on crop yields across altitudes in Ethiopia,” Clim. Change, vol. 170, no. 1–2, 2022, doi: 10.1007/s10584-022-03306-1.
 
+## Business Understanding
+
+Pada tahap ini, dilakukan klarifikasi terhadap permasalahan yang akan diselesaikan serta tujuan yang ingin dicapai melalui penerapan teknik **machine learning**. Penjelasan mengenai masalah utama yang dihadapi dalam konteks prediksi hasil pertanian, serta tujuan dari solusi yang diusulkan, akan disajikan secara rinci dalam bagian ini.
+
+### Problem Statements
+
+Masalah utama yang menjadi fokus dalam study kasus ini adalah sebagai berikut:
+
+1. **Memprediksi hasil panen berdasarkan faktor lingkungan dan input pertanian** karena hasil panen tanaman dipengaruhi oleh sejumlah faktor eksternal, di antaranya adalah curah hujan, suhu rata-rata, dan penggunaan pestisida. Ketidakpastian terhadap pengaruh dari faktor-faktor tersebut terhadap hasil pertanian seringkali menyulitkan petani dalam merencanakan produksi pertanian mereka. Oleh karena itu, dibutuhkan model prediktif yang dapat memproyeksikan hasil panen berdasarkan data yang tersedia, untuk memberikan gambaran yang lebih jelas tentang potensi hasil yang dapat diperoleh.
+
+3. **Mengidentifikasi faktor-faktor yang paling berpengaruh terhadap hasil panen**. Selain prediksi hasil panen, sangat penting untuk memahami faktor-faktor lingkungan dan input pertanian yang memiliki dampak signifikan terhadap hasil panen. Identifikasi faktor-faktor ini dapat memberikan wawasan yang berguna dalam perencanaan dan pengelolaan sumber daya pertanian secara lebih efektif.
+
+### Goals
+
+Tujuan yang ingin dicapai dalam study kasus ini adalah sebagai berikut:
+
+1. **Membangun model prediktif untuk hasil panen** yang dapat memproyeksikan hasil panen dengan akurasi yang baik. Model ini akan menggunakan data historis yang mencakup variabel-variabel seperti curah hujan, suhu, penggunaan pestisida, dan lainnya, untuk menghasilkan prediksi yang dapat membantu para petani dalam merencanakan strategi pertanian mereka.
+
+2. **Menilai pengaruh faktor lingkungan dan input pertanian terhadap hasil panen** untuk mengeksplorasi dan menganalisis faktor-faktor yang paling berpengaruh terhadap hasil panen. Dengan mengetahui faktor mana yang memiliki dampak terbesar, diharapkan para pemangku kepentingan dapat mengambil kebijakan yang lebih tepat dalam mengelola sektor pertanian.
+
+### Solution Statement
+
+Untuk mencapai tujuan tersebut, beberapa solusi yang diusulkan dalam merancang model prediksi ini adalah sebagai berikut:
+
+1. **Penerapan model regresi** karena mengingat bahwa hasil panen yang diprediksi merupakan variabel kontinu, model regresi akan diterapkan untuk menyelesaikan masalah ini. Beberapa model regresi yang akan diuji antara lain **Linear Regression**, **Random Forest Regression**, dan **XGBoost**. Masing-masing model ini akan dianalisis untuk melihat kecocokannya dalam memprediksi hasil panen berdasarkan variabel-variabel yang ada.
+
+2. **Optimalisasi model melalui hyperparameter tuning** untuk meningkatkan performa model yang digunakan. Tahap **hyperparameter tuning** akan dilakukan guna mencari kombinasi parameter yang memberikan hasil terbaik. Proses ini diharapkan dapat meningkatkan akurasi prediksi dan memperbaiki kelemahan yang mungkin ada pada model dasar.
+
+3. **Evaluasi dan pemilihan model terbaik** dengan melakukan pengujian terhadap model, performa masing-masing model akan dievaluasi menggunakan metrik yang relevan, seperti **Root Mean Squared Error (RMSE)** atau **R-squared (R²)**. Model dengan performa terbaik berdasarkan hasil evaluasi akan dipilih sebagai solusi akhir yang dapat digunakan untuk memprediksi hasil panen.
+
+Dengan pendekatan ini, diharapkan dapat dicapai prediksi hasil panen yang lebih akurat dan dapat memberikan informasi yang lebih jelas bagi para petani dalam merencanakan kegiatan pertanian mereka, serta memberikan wawasan yang berguna bagi pengambilan keputusan dalam pengelolaan sektor pertanian secara lebih efisien dan berkelanjutan.
+
+
