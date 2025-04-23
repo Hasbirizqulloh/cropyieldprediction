@@ -215,9 +215,47 @@ Menganalisis hubungan antara fitur-fitur dalam dataset menggunakan scatter plot,
       - 🌍 Negara seperti India, Pakistan, dan Indonesia memiliki kontribusi data yang besar namun dengan rata-rata yield yang bervariasi.
       - 🌾 Komoditas seperti Maize, Wheat, dan Rice memiliki volume data tinggi dengan rata-rata hasil panen yang berbeda-beda.
 
-
-
-
-
 Langkah-langkah eksplorasi ini memberikan wawasan awal yang penting sebagai dasar untuk proses persiapan data dan pembangunan model prediktif.
 
+## Data Preparation
+Pada tahap ini, dilakukan serangkaian proses **data preparation** untuk memastikan data siap digunakan dalam pemodelan machine learning. Proses dilakukan secara bertahap dan sistematis sesuai urutan sebagai berikut:
+
+### 1. Encoding Variabel Kategorikal 
+
+Fitur kategorikal seperti `Area` dan `Item` dikonversi menjadi format numerik menggunakan **One-Hot Encoding**.
+
+```python
+df_encoded = pd.get_dummies(df_clean_ou, columns=['Area', 'Item'])
+```
+Variabel kategorikal seperti Area dan Item tidak dapat digunakan secara langsung dalam model prediktif berbasis numerik seperti XGBoost. Oleh karena itu, dilakukan one-hot encoding untuk mengubah kategori menjadi fitur biner (0/1) agar bisa dibaca oleh algoritma.
+
+📌 Alasan Penggunaan Teknik ini:  
+One-hot encoding menjaga informasi kategori tanpa memaksakan urutan atau bobot numerik tertentu, sehingga lebih cocok untuk algoritma yang sensitif terhadap skala data seperti XGBoost dan PCA.
+
+### 2.  Reduksi Dimensi dengan PCA
+
+Dilakukan reduksi dimensi menggunakan PCA setelah encoding menghasilkan ratusan fitur.
+
+```python
+from sklearn.decomposition import PCA
+
+pca = PCA(n_components=0.95)  # Menjaga 95% varian
+X_pca = pca.fit_transform(X_encoded)
+```
+PCA digunakan untuk mengurangi dimensi data tanpa kehilangan banyak informasi, serta membantu mengurangi kompleksitas komputasi dan kemungkinan overfitting. Reduksi ini juga membantu dalam mempercepat proses pelatihan model dan meningkatkan performa generalisasi.
+
+📌 Alasan Penggunaan Teknik ini:  
+PCA digunakan untuk menyederhanakan kompleksitas data, mempercepat waktu pelatihan, serta mengurangi risiko overfitting akibat terlalu banyak fitur.
+
+### 3. Pembagian Data (Splitting)
+Data dibagi menjadi data pelatihan dan pengujian dengan rasio 80:20 menggunakan train_test_split dari Scikit-Learn.
+
+```python
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X_pca, y, test_size=0.2, random_state=42)
+```
+
+Tujuan dari pembagian ini adalah untuk menguji performa model pada data yang belum pernah dilihat sebelumnya. Ini merupakan praktik standar dalam membangun model prediktif agar dapat mengukur kemampuan generalisasi model.
+
+📌 Alasan Penggunaan Teknik ini:  
+Pembagian ini penting untuk memastikan bahwa model dapat dievaluasi dengan data yang tidak pernah dilihat sebelumnya (data uji), sehingga hasil evaluasi lebih objektif dan realistis.
