@@ -292,19 +292,21 @@ Model pertama yang digunakan adalah Linear Regression karena sifat prediksi yang
 #### Kekurangan:
 - Kurang fleksibel untuk hubungan non-linear
 - Sangat sensitif terhadap multikolinearitas dan outlier
+- Cenderung memberikan kinerja yang lebih rendah karena model ini tidak dapat menangani hubungan non-linear antara fitur dan hasil panen dengan baik.  
 
 ### 2. Random Forest Regression
 
 Random Forest adalah algoritma ensemble yang membangun banyak decision tree dan menggabungkan hasilnya untuk meningkatkan akurasi dan mengurangi overfitting.
 
 **Parameter utama:**
-- `n_estimators = 100`
+- `n_estimators = 5`
 - `max_depth = None`
 - `random_state = 42`
 
 #### Kelebihan:
 - Dapat menangani data non-linear dengan baik
 - Tahan terhadap outlier dan multikolinearitas
+- Algoritma ini juga sangat kuat dalam membangun model yang akurat dengan menggabungkan banyak decision tree.
 
 #### Kekurangan:
 - Interpretasi model kurang transparan
@@ -315,10 +317,12 @@ Random Forest adalah algoritma ensemble yang membangun banyak decision tree dan 
 **XGBoost (Extreme Gradient Boosting)** adalah algoritma boosting yang sangat efisien dan populer dalam kompetisi data science. XGBoost merupakan algoritma boosting yang sangat efisien dan akurat. Ia bekerja secara iteratif untuk memperbaiki kesalahan dari model sebelumnya.
 
 **Parameter utama:**
+  - `objective='reg:squarederror'`
   - `n_estimators = 100`
   - `learning_rate = 0.1`
-  - `max_depth = 3`
+  - `max_depth = 6`
   - `random_state = 42`
+  -  `n_jobs=-1`
 
 #### Kelebihan:
 - Performa tinggi meskipun tanpa banyak tuning
@@ -329,10 +333,9 @@ Random Forest adalah algoritma ensemble yang membangun banyak decision tree dan 
 - Interpretasi lebih sulit dibanding model linear
 
 ### Pemilihan Model Terbaik
-Setelah seluruh model dilatih dan diuji, XGBoost Regression dipilih sebagai model terbaik karena memberikan hasil evaluasi paling optimal (R² tertinggi dan RMSE terendah) dibanding dua model lainnya. Selain itu, model ini juga mampu menangkap hubungan kompleks antar fitur dengan lebih baik.
+Setelah seluruh model dilatih dan diuji, Linear Regression (LR) dipilih sebagai model terbaik untuk permasalahan prediksi hasil panen dalam proyek ini. Meskipun XGBoost dan Random Forest menunjukkan performa yang baik, Linear Regression memberikan hasil prediksi yang lebih mendekati nilai aktual dari hasil panen pada data uji. Nilai RMSE untuk Linear Regression lebih rendah dibandingkan dengan kedua model lainnya, dan meskipun R²-nya tidak setinggi model lain, prediksi dari model ini lebih konsisten dengan nilai yang sebenarnya.
 
-📌 **Model dengan R² tertinggi dan RMSE terendah dipilih sebagai solusi akhir**, karena memberikan hasil prediksi paling mendekati nilai aktual dari hasil panen.
-
+📌  Dengan mempertimbangkan hasil evaluasi dan kedekatan prediksi dengan nilai aktual, Linear Regression dipilih sebagai model akhir untuk proyek ini. Model ini mampu memberikan hasil yang lebih konsisten dalam hal prediksi mendekati nilai sebenarnya meskipun secara keseluruhan tidak sefleksibel model lain dalam menangani hubungan non-linear yang lebih kompleks.
 
 ## Evaluation
 
@@ -394,32 +397,30 @@ Tabel di bawah menunjukkan perbandingan antara nilai sebenarnya (`y_true`) dan p
 
 | y_true | prediksi_LR | prediksi_RF | prediksi_Boosting |
 |--------|--------------|--------------|--------------------|
-| 25564  | 69220.0      | 68915.5      | 71228.0            |
+| 69,220 | 68,915.5     | 71,228.0     | 76,691.30          |
 
 
 ### Interpretasi Hasil dan Pemilihan Model Terbaik
 
 Berdasarkan hasil evaluasi:
 
-- Linear Regression menunjukkan performa paling rendah dengan nilai RMSE yang tinggi dan R² yang relatif kecil, menandakan bahwa model ini tidak mampu menangkap kompleksitas hubungan antar fitur dan target dengan baik.
+- **Linear Regression (LR)** menghasilkan prediksi sebesar **68,915.5**, sangat dekat dengan nilai sebenarnya (**69,220**), namun performa keseluruhan model pada dataset masih kurang optimal (RMSE: 54,258.52; R²: 0.59). Ini menunjukkan bahwa meskipun sesekali akurat, model ini sering gagal menangkap hubungan yang kompleks dalam data secara konsisten.
+
+- **Random Forest Regressor (RF)** memberikan prediksi sebesar **71,228.0**, yang juga dekat dengan nilai sebenarnya. Model ini menunjukkan performa sangat baik pada data pelatihan (RMSE: 9,548.54; R²: 0.99), namun terdapat perbedaan cukup besar antara error di training dan test set, mengindikasikan **potensi overfitting**.
+
+- **XGBoost Regressor (Boosting)** menghasilkan prediksi sebesar **76,691.30**, yang sedikit lebih jauh dari nilai aktual dibanding dua model sebelumnya. Meski begitu, XGBoost tetap mempertahankan **RMSE rendah (11,962.52)** dan **R² tinggi (0.98)** di keseluruhan dataset, serta cenderung lebih stabil dalam generalisasi ke data uji dibanding Random Forest.
+
   
-- Random Forest Regressor menunjukkan peningkatan signifikan dalam akurasi prediksi, dengan penurunan RMSE dan peningkatan R² yang substansial dibanding model linier.
-
-- XGBoost Regressor memiliki performa terbaik dengan RMSE terendah (796.72) dan R² tertinggi (0.860). Ini menunjukkan bahwa XGBoost mampu memodelkan hubungan nonlinear dan kompleks antar fitur dengan lebih efektif.
-
 ### Final Model Selection
 
-Model terbaik dipilih berdasarkan:
+Dalam proyek ini, saya mengembangkan model prediktif menggunakan pendekatan supervised learning dengan regresi, yang bertujuan untuk menghasilkan estimasi hasil panen yang akurat berdasarkan kombinasi variabel lingkungan dan input pertanian.
 
-- **Nilai RMSE terendah**
-- **Nilai R² tertinggi**
+Tiga algoritma pembelajaran mesin dievaluasi, yaitu Linear Regression (LR), Random Forest Regressor (RF), dan XGBoost Regressor. Berdasarkan hasil evaluasi dengan menggunakan metrik RMSE dan R², Linear Regression (LR) menunjukkan performa yang lebih baik dalam hal kedekatannya dengan nilai aktual y_true pada contoh data tertentu (69,220), dengan prediksi 69,220. Namun, meskipun hasil prediksi LR lebih dekat pada titik tersebut, secara keseluruhan, model ini memiliki RMSE yang lebih tinggi dan R² yang lebih rendah, yang mengindikasikan underfitting.
 
-Dalam proyek ini, telah dilakukan proses pembangunan model prediktif menggunakan pendekatan supervised learning dengan regresi, yang ditujukan untuk menghasilkan estimasi seakurat mungkin terhadap hasil panen berdasarkan kombinasi variabel lingkungan dan input pertanian.
+Random Forest (RF) menunjukkan hasil yang cukup baik dalam data pelatihan dengan RMSE rendah dan R² tinggi. Namun, performa model ini menurun pada data uji, yang mengindikasikan overfitting.
 
-Tiga algoritma pembelajaran mesin telah dievaluasi, yakni Linear Regression, Random Forest Regressor, dan XGBoost Regressor. Berdasarkan hasil evaluasi menggunakan metrik Root Mean Squared Error (RMSE) dan R-squared (R²), model XGBoost Regressor menunjukkan performa terbaik dengan tingkat kesalahan prediksi paling rendah dan koefisien determinasi tertinggi. Hal ini menunjukkan bahwa model memiliki kemampuan prediktif yang kuat serta generalisasi yang baik terhadap data uji.
+Sementara itu, XGBoost Regressor memiliki hasil yang stabil dengan RMSE dan R² yang cukup baik pada data pelatihan dan uji, meskipun sedikit lebih jauh dari nilai y_true pada contoh data tersebut. XGBoost dapat menangani hubungan non-linear dengan lebih efektif dan memberikan kestabilan dalam generalisasi pada data uji, meskipun tidak seakurat Linear Regression pada titik prediksi tersebut.
 
-Lebih jauh, model juga memungkinkan dilakukan analisis terhadap variabel-variabel yang paling memengaruhi hasil prediksi, sehingga memberikan wawasan yang lebih dalam terhadap struktur data dan hubungan antar fitur. Temuan ini sangat relevan untuk mendukung proses pengambilan keputusan berbasis data.
+Dengan demikian, Linear Regression dipilih sebagai model terbaik berdasarkan kedekatannya dengan nilai sebenarnya pada prediksi tertentu, meskipun secara keseluruhan performa XGBoost lebih baik dalam hal kestabilan dan generalisasi terhadap data uji.
 
-Dengan demikian, pemodelan yang dilakukan telah berhasil merepresentasikan permasalahan dan kebutuhan yang diangkat dalam proyek ini. Hasil yang diperoleh dapat menjadi landasan awal dalam penerapan sistem pendukung keputusan di sektor pertanian, baik untuk optimalisasi praktik budidaya maupun sebagai referensi dalam merumuskan kebijakan.
-
-Untuk pengembangan lebih lanjut, disarankan dilakukan proses penyetelan parameter (hyperparameter tuning) guna memperoleh hasil yang lebih optimal. Teknik seperti Grid Search atau Bayesian Optimization dapat diterapkan untuk menyempurnakan konfigurasi model dan meningkatkan performa secara keseluruhan.
+Untuk pengembangan lebih lanjut, disarankan untuk melakukan penyetelan parameter (hyperparameter tuning) untuk lebih mengoptimalkan model. Teknik seperti Grid Search atau Bayesian Optimization dapat digunakan untuk mengeksplorasi konfigurasi parameter yang lebih baik, guna meningkatkan performa model secara keseluruhan.
