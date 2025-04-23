@@ -194,11 +194,29 @@ Distribusi fitur numerik divisualisasikan menggunakan histogram dengan 60 bin:
 
 
 #### 4. Multivariate Analysis
-Menganalisis hubungan antara fitur-fitur dalam dataset menggunakan scatter plot, heatmap korelasi, atau visualisasi lainnya. Ini membantu mengidentifikasi keterkaitan antar variabel, seperti hubungan antara suhu, curah hujan, dan hasil panen.
-  
-- Identifikasi nilai hilang (missing values) dan pencilan (outliers) pada fitur numerik.
-- Visualisasi hubungan antara fitur numerik seperti curah hujan, suhu, dan pestisida terhadap hasil panen menggunakan scatter plot dan heatmap korelasi.
-- Analisis tren hasil panen dari tahun ke tahun berdasarkan rata-rata yield nasional.
+Menganalisis hubungan antara fitur-fitur dalam dataset menggunakan scatter plot, heatmap korelasi, atau visualisasi lainnya. Ini membantu mengidentifikasi keterkaitan antar variabel, seperti hubungan antara suhu, curah hujan, dan hasil panen. 
+  - Korelasi Antar Fitur Numerik  
+    Untuk melihat hubungan antar fitur numerik, digunakan **Heatmap Korelasi**. Hasil analisis menunjukkan:
+    
+      - 📈 **Korelasi tertinggi** tercatat antara `avg_temp` dan `average_rain_fall_mm_per_year` dengan nilai **0.32**, yang masih tergolong korelasi lemah.
+      - 🎯 **Target utama** `hg/ha_yield` memiliki korelasi **sangat lemah terhadap semua variabel numerik lainnya**, yang menandakan bahwa hubungan antara hasil panen dan fitur lingkungan tidak bersifat linear sederhana.
+
+  - Relasi Variabel Kategorikal dan Target  
+    Visualisasi distribusi rata-rata hasil panen (`hg/ha_yield`) berdasarkan variabel kategorikal `Area` dan `Item`:
+    ```python
+        cat_feature = df_clean_ou.select_dtypes(include='object').columns.tolist()
+        for feature in cat_feature:
+            sns.catplot(x=feature, y='hg/ha_yield', data=df_clean_ou, kind='bar', height=4, aspect=3, palette='Set3')
+            plt.xticks(rotation=90)
+            plt.show()
+    ```
+    📌 Insight:
+      - 🌍 Negara seperti India, Pakistan, dan Indonesia memiliki kontribusi data yang besar namun dengan rata-rata yield yang bervariasi.
+      - 🌾 Komoditas seperti Maize, Wheat, dan Rice memiliki volume data tinggi dengan rata-rata hasil panen yang berbeda-beda.
+
+
+
+
 
 Langkah-langkah eksplorasi ini memberikan wawasan awal yang penting sebagai dasar untuk proses persiapan data dan pembangunan model prediktif.
 
