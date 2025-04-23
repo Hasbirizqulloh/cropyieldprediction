@@ -102,11 +102,39 @@ Dataset ini memiliki tujuh kolom utama, dengan penjelasan sebagai berikut:
 - **`avg_temp`**  
   Rata-rata suhu udara tahunan (dalam °C). Faktor penting yang memengaruhi pertumbuhan dan hasil panen tanaman.
 
-### Eksplorasi Awal
+### Eksploratory Data Analysis (EDA)
 
-Beberapa langkah eksplorasi data yang dilakukan pada tahap awal untuk memahami karakteristik dataset:
+Pada tahap ini, dilakukan beberapa tahapan eksplorasi untuk memahami karakteristik dataset. Proses ini mencakup teknik visualisasi data dan analisis eksploratif untuk mendapatkan wawasan yang lebih mendalam mengenai data yang digunakan. Berikut adalah tahapan yang dilakukan:
 
-- Pemeriksaan distribusi nilai pada kolom target (`hg/ha_yield`).
+1. Deskripsi Variable  
+Memahami setiap fitur dalam dataset, baik yang kategorikal maupun numerik. Ini termasuk penjelasan tentang Area, Item, Year, serta variabel target yaitu hg/ha_yield, yang merupakan hasil panen dalam satuan hectogram per hektar. Pengetahuan ini sangat penting sebelum melakukan analisis lebih lanjut. Hasil dari tahap ini adalah sebagai berikut:
+    - hg/ha_yield merupakan target yang ingin diprediksi, yaitu hasil panen dalam satuan hectogram per hektar (hg/ha).
+    - Variabel Area dan Item adalah kategorikal dan perlu dilakukan encoding sebelum digunakan dalam model.
+    - Variable Year, hg/ha_yield, average_rain_fall_mm_per_year, pesticides_tonnes, dan avg_temp merupakan variable numerik.
+3. Menangani Missing Value dan Outliers
+   - Missing Values  
+Mengidentifikasi apakah ada data yang hilang pada setiap kolom dan menentukan apakah akan menghapus atau menggantinya menggunakan teknik imputation. Pada tahap ini hasilnya tidak ditemukan adanya nilai kosong (NaN/null) di seluruh kolom dataset, sehingga tidak perlu dilakukan imputasi atau penghapusan data karena masalah nilai hilang dan hanya terdapat kolom bernama Unnamed, yang merupakan duplikasi dari index baris. Kolom ini tidak memberikan informasi tambahan dan telah dihapus.
+   - Outliers  
+Mendeteksi outliers yang dapat memengaruhi hasil analisis dan model. Pada tahap ini outliers terdeteksi pada tiga variabel utama berdasarkan hasil statistik deskriptif, yaitu:
+      - `hg/ha_yield`: Nilai maksimum mencapai 501,412, jauh di atas Q3 (104,676.75).
+      - `avg_temp`: Distribusi terlihat normal, tapi nilai minimum 1.3 °C cukup rendah
+      - `pesticides_tonnes`: Rentang nilai dari 0.04 hingga 367,778 ton. Nilai minimum berasal dari tahun-tahun awal di beberapa negara dan dianggap valid, meskipun secara statistik tergolong ekstrem.
+        
+      Penanganan dilakukan dengan metode **Interquartile Range (IQR)**:
+ ```python
+    outlier_cols = df_clean[['pesticides_tonnes', 'avg_temp', 'hg/ha_yield']]
+    Q1 = outlier_cols.quantile(0.25)
+    Q3 = outlier_cols.quantile(0.75)
+    IQR = Q3 - Q1
+
+    df_clean_ou = df_clean[~((outlier_cols < (Q1 - 1.5 * IQR)) | 
+                             (outlier_cols > (Q3 + 1.5 * IQR))).any(axis=1)]
+ ```
+4. Univariate Analysis  
+Menganalisis distribusi setiap variabel secara terpisah menggunakan visualisasi seperti histogram atau boxplot. Hal ini membantu memahami pola data dan mendeteksi ketidakseimbangan atau distribusi yang tidak normal, terutama pada variabel target (hg/ha_yield).
+5. Multivariate Analysis
+Menganalisis hubungan antara fitur-fitur dalam dataset menggunakan scatter plot, heatmap korelasi, atau visualisasi lainnya. Ini membantu mengidentifikasi keterkaitan antar variabel, seperti hubungan antara suhu, curah hujan, dan hasil panen.
+  
 - Identifikasi nilai hilang (missing values) dan pencilan (outliers) pada fitur numerik.
 - Visualisasi hubungan antara fitur numerik seperti curah hujan, suhu, dan pestisida terhadap hasil panen menggunakan scatter plot dan heatmap korelasi.
 - Analisis tren hasil panen dari tahun ke tahun berdasarkan rata-rata yield nasional.
