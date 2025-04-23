@@ -200,6 +200,7 @@ Menganalisis hubungan antara fitur-fitur dalam dataset menggunakan scatter plot,
     
       - 📈 **Korelasi tertinggi** tercatat antara `avg_temp` dan `average_rain_fall_mm_per_year` dengan nilai **0.32**, yang masih tergolong korelasi lemah.
       - 🎯 **Target utama** `hg/ha_yield` memiliki korelasi **sangat lemah terhadap semua variabel numerik lainnya**, yang menandakan bahwa hubungan antara hasil panen dan fitur lingkungan tidak bersifat linear sederhana.
+      ![heatmap correlation](./Images/Image.png)
 
   - Relasi Variabel Kategorikal dan Target  
     Visualisasi distribusi rata-rata hasil panen (`hg/ha_yield`) berdasarkan variabel kategorikal `Area` dan `Item`:
