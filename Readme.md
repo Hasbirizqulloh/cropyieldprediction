@@ -232,33 +232,42 @@ Variabel kategorikal seperti Area dan Item tidak dapat digunakan secara langsung
 📌 Alasan Penggunaan Teknik ini:  
 One-hot encoding menjaga informasi kategori tanpa memaksakan urutan atau bobot numerik tertentu, sehingga lebih cocok untuk algoritma yang sensitif terhadap skala data seperti XGBoost dan PCA.
 
-### 2.  Reduksi Dimensi dengan PCA
-
-Dilakukan reduksi dimensi menggunakan PCA setelah encoding menghasilkan ratusan fitur.
-
-```python
-from sklearn.decomposition import PCA
-
-pca = PCA(n_components=0.95)  # Menjaga 95% varian
-X_pca = pca.fit_transform(X_encoded)
-```
-PCA digunakan untuk mengurangi dimensi data tanpa kehilangan banyak informasi, serta membantu mengurangi kompleksitas komputasi dan kemungkinan overfitting. Reduksi ini juga membantu dalam mempercepat proses pelatihan model dan meningkatkan performa generalisasi.
-
-📌 Alasan Penggunaan Teknik ini:  
-PCA digunakan untuk menyederhanakan kompleksitas data, mempercepat waktu pelatihan, serta mengurangi risiko overfitting akibat terlalu banyak fitur.
-
-### 3. Pembagian Data (Splitting)
+### 2. Pembagian Data (Splitting)
 Data dibagi menjadi data pelatihan dan pengujian dengan rasio 80:20 menggunakan train_test_split dari Scikit-Learn.
 
 ```python
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X_pca, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 ```
 
 Tujuan dari pembagian ini adalah untuk menguji performa model pada data yang belum pernah dilihat sebelumnya. Ini merupakan praktik standar dalam membangun model prediktif agar dapat mengukur kemampuan generalisasi model.
 
 📌 Alasan Penggunaan Teknik ini:  
 Pembagian ini penting untuk memastikan bahwa model dapat dievaluasi dengan data yang tidak pernah dilihat sebelumnya (data uji), sehingga hasil evaluasi lebih objektif dan realistis.
+
+### 3.  Standarisasi dan Reduksi Dimensi dengan PCA 
+
+Sebelum melakukan reduksi dimensi dengan PCA, dilakukan proses standarisasi terhadap fitur numerik. Ini penting karena PCA bekerja berdasarkan variansi antar fitur, dan fitur dengan skala lebih besar akan mendominasi hasil jika tidak dinormalisasi terlebih dahulu.
+
+```python
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+```
+Statistik (seperti mean dan standar deviasi) hanya dihitung dari data pelatihan untuk menghindari kebocoran informasi dari data uji. Langkah ini sangat krusial untuk algoritma seperti Linear Regression, yang mengasumsikan bahwa semua fitur memiliki kontribusi seimbang dan PCA, karena metode ini mengandalkan variansi untuk menentukan komponen utama.
+
+Setelah standarisasi, dilakukan reduksi dimensi menggunakan PCA.
+
+```python
+pca = PCA(n_components=0.9)
+X_train_pca = pca.fit_transform(X_train_scaled)
+X_test_pca = pca.transform(X_test_scaled)
+```
+PCA digunakan untuk mengurangi dimensi data tanpa kehilangan banyak informasi, serta membantu mengurangi kompleksitas komputasi dan kemungkinan overfitting. Reduksi ini juga membantu dalam mempercepat proses pelatihan model dan meningkatkan performa generalisasi.
+
+📌 Alasan Penggunaan Teknik ini:  
+Standarisasi digunakan karena fitur dengan skala yang lebih besar dapat mendominasi perhitungan. Dengan standarisasi, semua fitur diperlakukan secara setara dalam proses pembelajaran. PCA digunakan untuk menyederhanakan kompleksitas data, mempercepat waktu pelatihan, serta mengurangi risiko overfitting akibat terlalu banyak fitur.
+
+
 
 ## Modeling 
 Pada tahapan ini, dilakukan proses pemodelan menggunakan algoritma Linear Regression, Random Forest Regression, dan XGBoost Regression untuk menyelesaikan permasalahan prediksi hasil panen berdasarkan variabel lingkungan dan input pertanian. Setiap model dijelaskan dari segi konsep, parameter yang digunakan, serta evaluasi performanya menggunakan metrik Root Mean Squared Error (RMSE) dan R² Score.
@@ -360,11 +369,33 @@ Karena target variabel (hg/ha_yield) merupakan data kontinu (regresi), metrik RM
 
 | Model                  | RMSE     | R² Score |
 |------------------------|----------|----------|
-| Linear Regression      | XX.XXX   | XX.XXX   |
-| Random Forest Regressor | XX.XXX   | XX.XXX   |
-| XGBoost Regressor      | XX.XXX   | XX.XXX   |
+| Linear Regression      | 54258.52   |  0.59   |
+| Random Forest Regressor | 9548.54   | 0.99  |
+| XGBoost Regressor      | 11962.52   |  0.98  |
 
-> *Note: Nilai-nilai di atas akan diisi berdasarkan hasil evaluasi aktual dari model yang dilatih.*
+### Evaluasi Model - Mean Squared Error (MSE)
+
+Tabel berikut menunjukkan nilai Mean Squared Error (MSE) pada data pelatihan (train) dan data pengujian (test) untuk masing-masing model:
+
+| Model     | Train MSE       | Test MSE        |
+|-----------|------------------|------------------|
+| LR        | 3,014,327.59     | 2,943,986.62     |
+| RF        | 20,567.55        | 91,174.55        |
+| Boosting  | 94,251.84        | 143,101.78       |
+
+#### Catatan:
+- **LR (Linear Regression)** memiliki error tinggi di train dan test → indikasi **underfitting**.
+- **RF (Random Forest)** dan **Boosting** menunjukkan error train sangat rendah dibanding test → indikasi **overfitting**.
+
+
+### Hasil Prediksi Model
+
+Tabel di bawah menunjukkan perbandingan antara nilai sebenarnya (`y_true`) dan prediksi dari tiga model yang digunakan: Linear Regression (LR), Random Forest (RF), dan Boosting.
+
+| y_true | prediksi_LR | prediksi_RF | prediksi_Boosting |
+|--------|--------------|--------------|--------------------|
+| 25564  | 69220.0      | 68915.5      | 71228.0            |
+
 
 ### Interpretasi Hasil dan Pemilihan Model Terbaik
 
