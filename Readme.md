@@ -106,33 +106,94 @@ Dataset ini memiliki tujuh kolom utama, dengan penjelasan sebagai berikut:
 
 Pada tahap ini, dilakukan beberapa tahapan eksplorasi untuk memahami karakteristik dataset. Proses ini mencakup teknik visualisasi data dan analisis eksploratif untuk mendapatkan wawasan yang lebih mendalam mengenai data yang digunakan. Berikut adalah tahapan yang dilakukan:
 
-1. Deskripsi Variable  
+#### 1. Deskripsi Variable  
 Memahami setiap fitur dalam dataset, baik yang kategorikal maupun numerik. Ini termasuk penjelasan tentang Area, Item, Year, serta variabel target yaitu hg/ha_yield, yang merupakan hasil panen dalam satuan hectogram per hektar. Pengetahuan ini sangat penting sebelum melakukan analisis lebih lanjut. Hasil dari tahap ini adalah sebagai berikut:
     - hg/ha_yield merupakan target yang ingin diprediksi, yaitu hasil panen dalam satuan hectogram per hektar (hg/ha).
     - Variabel Area dan Item adalah kategorikal dan perlu dilakukan encoding sebelum digunakan dalam model.
     - Variable Year, hg/ha_yield, average_rain_fall_mm_per_year, pesticides_tonnes, dan avg_temp merupakan variable numerik.
-3. Menangani Missing Value dan Outliers
+    
+#### 2. Menangani Missing Value dan Outliers
    - Missing Values  
 Mengidentifikasi apakah ada data yang hilang pada setiap kolom dan menentukan apakah akan menghapus atau menggantinya menggunakan teknik imputation. Pada tahap ini hasilnya tidak ditemukan adanya nilai kosong (NaN/null) di seluruh kolom dataset, sehingga tidak perlu dilakukan imputasi atau penghapusan data karena masalah nilai hilang dan hanya terdapat kolom bernama Unnamed, yang merupakan duplikasi dari index baris. Kolom ini tidak memberikan informasi tambahan dan telah dihapus.
    - Outliers  
 Mendeteksi outliers yang dapat memengaruhi hasil analisis dan model. Pada tahap ini outliers terdeteksi pada tiga variabel utama berdasarkan hasil statistik deskriptif, yaitu:
       - `hg/ha_yield`: Nilai maksimum mencapai 501,412, jauh di atas Q3 (104,676.75).
-      - `avg_temp`: Distribusi terlihat normal, tapi nilai minimum 1.3 °C cukup rendah
+      - `avg_temp`: Nilai minimum avg_temp sebesar 1.3°C setelah dianalisis ternyata berasal dari Norway, dan masih dianggap wajar mengingat iklim negara tersebut yang dingin tapi harus tetap ditangani nilai outliernya.
       - `pesticides_tonnes`: Rentang nilai dari 0.04 hingga 367,778 ton. Nilai minimum berasal dari tahun-tahun awal di beberapa negara dan dianggap valid, meskipun secara statistik tergolong ekstrem.
         
       Penanganan dilakukan dengan metode **Interquartile Range (IQR)**:
- ```python
-    outlier_cols = df_clean[['pesticides_tonnes', 'avg_temp', 'hg/ha_yield']]
-    Q1 = outlier_cols.quantile(0.25)
-    Q3 = outlier_cols.quantile(0.75)
-    IQR = Q3 - Q1
+     ```python
+      outlier_cols = df_clean[['pesticides_tonnes', 'avg_temp', 'hg/ha_yield']]
+      Q1 = outlier_cols.quantile(0.25)
+      Q3 = outlier_cols.quantile(0.75)
+      IQR = Q3 - Q1
 
-    df_clean_ou = df_clean[~((outlier_cols < (Q1 - 1.5 * IQR)) | 
-                             (outlier_cols > (Q3 + 1.5 * IQR))).any(axis=1)]
- ```
-4. Univariate Analysis  
+      df_clean_ou = df_clean[~((outlier_cols < (Q1 - 1.5 * IQR)) | (outlier_cols > (Q3 + 1.5 * IQR))).any(axis=1)]
+     ```
+     Dataset df_clean_ou merupakan hasil dari proses ini, yang telah disaring dari nilai outlier untuk ketiga fitur tersebut. Dataset ini akan digunakan untuk proses analisis dan modeling lebih lanjut.
+
+
+#### 3. Univariate Analysis  
 Menganalisis distribusi setiap variabel secara terpisah menggunakan visualisasi seperti histogram atau boxplot. Hal ini membantu memahami pola data dan mendeteksi ketidakseimbangan atau distribusi yang tidak normal, terutama pada variabel target (hg/ha_yield).
-5. Multivariate Analysis
+Analisis univariat bertujuan untuk melihat distribusi setiap fitur secara individu. Analisis ini dibagi menjadi dua bagian:
+- Fitur Kategorikal
+Distribusi kategori dianalisis menggunakan metode value counts dan visualisasi bar chart horizontal. Fokus pada dua fitur utama: `Area` (negara) dan `Item` (komoditas pertanian).
+
+  **Distribusi Area (Negara):**
+
+    | Negara       | Count | Percent (%) |
+    |--------------|--------|-------------|
+    | India        | 3630   | 14.6%       |
+    | Pakistan     | 1449   | 5.8%        |
+    | Mexico       | 1368   | 5.5%        |
+    | Brazil       | 891    | 3.6%        |
+    | Indonesia    | 828    | 3.3%        |
+    | ...          | ...    | ...         |
+    | Belgium      | 26     | 0.1%        |
+    | Norway       | 23     | 0.1%        |
+    | Sweden       | 23     | 0.1%        |
+
+    📌 **Insight:** Data paling banyak berasal dari India (14.6%), diikuti oleh Pakistan dan Mexico. Negara dengan jumlah data terkecil antara lain Norwegia, Swedia, dan Belgia.
+
+    **Distribusi Item (Komoditas):**
+
+    | Komoditas               | Count | Percent (%) |
+    |-------------------------|--------|-------------|
+    | Maize                   | 3959   | 16.0%       |
+    | Wheat                   | 3690   | 14.9%       |
+    | Rice, paddy             | 3226   | 13.0%       |
+    | Soybeans                | 3061   | 12.3%       |
+    | Sorghum                 | 2877   | 11.6%       |
+    | Potatoes                | 2871   | 11.6%       |
+    | Sweet potatoes          | 2468   | 9.9%        |
+    | Cassava                 | 1460   | 5.9%        |
+    | Yams                    | 684    | 2.8%        |
+    | Plantains and others    | 519    | 2.1%        |
+
+    📌 **Insight:** Komoditas dengan jumlah data terbanyak adalah jagung (`Maize`) sebesar 16%, disusul gandum (`Wheat`) dan padi (`Rice, paddy`). Komoditas minor seperti `Plantains`,           `Yams`, dan `Cassava` hanya menyumbang sebagian kecil.
+- Fitur Numerikal
+Distribusi fitur numerik divisualisasikan menggunakan histogram dengan 60 bin:
+
+![Histograms of Numerical Features](./path_to_histogram_image.png)
+
+          Fitur yang dianalisis:
+
+          - `Year`
+          - `hg/ha_yield`
+          - `average_rain_fall_mm_per_year`
+          - `pesticides_tonnes`
+          - `avg_temp`
+
+  📌 **Insight Histogram:**
+
+  - **Year:** Distribusi seragam antara 1990 hingga 2013.
+  - **hg/ha_yield:** Terdistribusi miring ke kanan (right-skewed), menunjukkan banyak data berada di rentang yield yang rendah.
+  - **average_rain_fall_mm_per_year:** Terlihat ada puncak-puncak curah hujan tertentu yang mendominasi dataset.
+  - **pesticides_tonnes:** Skewed ke kanan. Banyak nilai kecil, tetapi juga ada beberapa data ekstrem (outlier) dengan penggunaan pestisida sangat tinggi.
+  - **avg_temp:** Terdistribusi cukup normal, namun dengan dua puncak (bimodal), kemungkinan menunjukkan perbedaan iklim antar negara (subtropis vs tropis/dingin).
+
+
+#### 4. Multivariate Analysis
 Menganalisis hubungan antara fitur-fitur dalam dataset menggunakan scatter plot, heatmap korelasi, atau visualisasi lainnya. Ini membantu mengidentifikasi keterkaitan antar variabel, seperti hubungan antara suhu, curah hujan, dan hasil panen.
   
 - Identifikasi nilai hilang (missing values) dan pencilan (outliers) pada fitur numerik.
