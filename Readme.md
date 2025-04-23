@@ -174,7 +174,7 @@ Distribusi kategori dianalisis menggunakan metode value counts dan visualisasi b
 - Fitur Numerikal
 Distribusi fitur numerik divisualisasikan menggunakan histogram dengan 60 bin:
 
-![Histograms of Numerical Features](./path_to_histogram_image.png)
+![Histograms of Numerical Features](./Images/download.png)
 
           Fitur yang dianalisis:
 
