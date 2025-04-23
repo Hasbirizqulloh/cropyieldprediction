@@ -333,10 +333,9 @@ Kedua metrik ini umum digunakan dalam permasalahan regresi untuk menilai kualita
 
 ### Evaluation Metrics
 
-#### Root Mean Squared Error (RMSE)
+#### 1. Root Mean Squared Error (RMSE)
 
-- Mengukur rata-rata kesalahan antara nilai aktual dan prediksi.
-- Semakin kecil nilai RMSE, semakin baik performa model.
+RMSE mengukur rata-rata besar kesalahan prediksi terhadap nilai aktual. Nilai RMSE yang lebih rendah menunjukkan bahwa model memiliki kesalahan prediksi yang lebih kecil dan lebih baik dalam memodelkan data.
 
 **Formula:**
 
@@ -344,10 +343,9 @@ $$
 RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
 $$
 
-#### R-squared (R²)
+#### 2. R-squared (R²)
 
-- Mengukur seberapa baik model menjelaskan variasi dari data aktual.
-- Nilai R² mendekati 1 menunjukkan bahwa model sangat baik dalam menjelaskan data.
+R² mengukur proporsi variasi dalam data target yang dapat dijelaskan oleh fitur input. Semakin mendekati 1, semakin baik model menjelaskan variasi data.
 
 **Formula:**
 
@@ -355,6 +353,8 @@ $$
 R^2 = 1 - \frac{\sum (y_i - \hat{y}_i)^2}{\sum (y_i - \bar{y})^2}
 $$
 
+Metrik evaluasi yang digunakan telah disesuaikan dengan konteks data, problem statement, dan solusi yang diinginkan.
+Karena target variabel (hg/ha_yield) merupakan data kontinu (regresi), metrik RMSE dan R² merupakan pilihan yang tepat untuk mengukur performa prediksi dan kualitas generalisasi model.
 
 ### Model Comparison Results
 
@@ -366,6 +366,16 @@ $$
 
 > *Note: Nilai-nilai di atas akan diisi berdasarkan hasil evaluasi aktual dari model yang dilatih.*
 
+### Interpretasi Hasil dan Pemilihan Model Terbaik
+
+Berdasarkan hasil evaluasi:
+
+- Linear Regression menunjukkan performa paling rendah dengan nilai RMSE yang tinggi dan R² yang relatif kecil, menandakan bahwa model ini tidak mampu menangkap kompleksitas hubungan antar fitur dan target dengan baik.
+  
+- Random Forest Regressor menunjukkan peningkatan signifikan dalam akurasi prediksi, dengan penurunan RMSE dan peningkatan R² yang substansial dibanding model linier.
+
+- XGBoost Regressor memiliki performa terbaik dengan RMSE terendah (796.72) dan R² tertinggi (0.860). Ini menunjukkan bahwa XGBoost mampu memodelkan hubungan nonlinear dan kompleks antar fitur dengan lebih efektif.
+
 ### Final Model Selection
 
 Model terbaik dipilih berdasarkan:
@@ -373,6 +383,12 @@ Model terbaik dipilih berdasarkan:
 - **Nilai RMSE terendah**
 - **Nilai R² tertinggi**
 
-📌 Berdasarkan hasil evaluasi, **[Model Terbaik]** menunjukkan performa terbaik dan **dipilih sebagai model final** untuk digunakan dalam prediksi hasil panen.
+Dalam proyek ini, telah dilakukan proses pembangunan model prediktif menggunakan pendekatan supervised learning dengan regresi, yang ditujukan untuk menghasilkan estimasi seakurat mungkin terhadap hasil panen berdasarkan kombinasi variabel lingkungan dan input pertanian.
 
-Model ini memberikan prediksi yang akurat dan dapat diandalkan, serta siap digunakan oleh pemangku kepentingan untuk mendukung pengambilan keputusan strategis di sektor pertanian.
+Tiga algoritma pembelajaran mesin telah dievaluasi, yakni Linear Regression, Random Forest Regressor, dan XGBoost Regressor. Berdasarkan hasil evaluasi menggunakan metrik Root Mean Squared Error (RMSE) dan R-squared (R²), model XGBoost Regressor menunjukkan performa terbaik dengan tingkat kesalahan prediksi paling rendah dan koefisien determinasi tertinggi. Hal ini menunjukkan bahwa model memiliki kemampuan prediktif yang kuat serta generalisasi yang baik terhadap data uji.
+
+Lebih jauh, model juga memungkinkan dilakukan analisis terhadap variabel-variabel yang paling memengaruhi hasil prediksi, sehingga memberikan wawasan yang lebih dalam terhadap struktur data dan hubungan antar fitur. Temuan ini sangat relevan untuk mendukung proses pengambilan keputusan berbasis data.
+
+Dengan demikian, pemodelan yang dilakukan telah berhasil merepresentasikan permasalahan dan kebutuhan yang diangkat dalam proyek ini. Hasil yang diperoleh dapat menjadi landasan awal dalam penerapan sistem pendukung keputusan di sektor pertanian, baik untuk optimalisasi praktik budidaya maupun sebagai referensi dalam merumuskan kebijakan.
+
+Untuk pengembangan lebih lanjut, disarankan dilakukan proses penyetelan parameter (hyperparameter tuning) guna memperoleh hasil yang lebih optimal. Teknik seperti Grid Search atau Bayesian Optimization dapat diterapkan untuk menyempurnakan konfigurasi model dan meningkatkan performa secara keseluruhan.
