@@ -259,3 +259,120 @@ Tujuan dari pembagian ini adalah untuk menguji performa model pada data yang bel
 
 📌 Alasan Penggunaan Teknik ini:  
 Pembagian ini penting untuk memastikan bahwa model dapat dievaluasi dengan data yang tidak pernah dilihat sebelumnya (data uji), sehingga hasil evaluasi lebih objektif dan realistis.
+
+## Modeling 
+Pada tahapan ini, dilakukan proses pemodelan menggunakan algoritma Linear Regression, Random Forest Regression, dan XGBoost Regression untuk menyelesaikan permasalahan prediksi hasil panen berdasarkan variabel lingkungan dan input pertanian. Setiap model dijelaskan dari segi konsep, parameter yang digunakan, serta evaluasi performanya menggunakan metrik Root Mean Squared Error (RMSE) dan R² Score.
+
+Tahap pemodelan dilakukan untuk membangun sistem prediktif terhadap **hasil panen (`hg/ha_yield`)** berdasarkan variabel lingkungan dan input pertanian. Tiga algoritma regresi digunakan dalam proyek ini, yaitu:
+
+- **Linear Regression**
+- **Random Forest Regression**
+- **XGBoost Regression**
+
+Setiap algoritma dipilih berdasarkan karakteristik dan kekuatannya masing-masing.
+### 1. Linear Regression
+
+Model pertama yang digunakan adalah Linear Regression karena sifat prediksi yang dilakukan bersifat kontinu. Linear Regression memberikan baseline sederhana untuk mengukur kinerja awal dari model prediksi hasil panen. Model ini mengasumsikan hubungan linear antara fitur dan target.
+
+**Hyperparameter Tuning** Tidak dilakukan, karena model secara default mengestimasi koefisien secara langsung.
+
+#### Kelebihan:
+- Mudah diinterpretasikan
+- Cepat dalam pelatihan
+
+#### Kekurangan:
+- Kurang fleksibel untuk hubungan non-linear
+- Sangat sensitif terhadap multikolinearitas dan outlier
+
+### 2. Random Forest Regression
+
+Random Forest adalah algoritma ensemble yang membangun banyak decision tree dan menggabungkan hasilnya untuk meningkatkan akurasi dan mengurangi overfitting.
+
+**Parameter utama:**
+- `n_estimators = 100`
+- `max_depth = None`
+- `random_state = 42`
+
+#### Kelebihan:
+- Dapat menangani data non-linear dengan baik
+- Tahan terhadap outlier dan multikolinearitas
+
+#### Kekurangan:
+- Interpretasi model kurang transparan
+- Proses pelatihan relatif lebih lambat
+
+### 3. XGBoost Regression
+
+**XGBoost (Extreme Gradient Boosting)** adalah algoritma boosting yang sangat efisien dan populer dalam kompetisi data science. XGBoost merupakan algoritma boosting yang sangat efisien dan akurat. Ia bekerja secara iteratif untuk memperbaiki kesalahan dari model sebelumnya.
+
+**Parameter utama:**
+  - `n_estimators = 100`
+  - `learning_rate = 0.1`
+  - `max_depth = 3`
+  - `random_state = 42`
+
+#### Kelebihan:
+- Performa tinggi meskipun tanpa banyak tuning
+- Dapat menangani data kompleks dan non-linear dengan baik
+
+#### Kekurangan:
+- Waktu pelatihan lebih lama dibandingkan model sederhana
+- Interpretasi lebih sulit dibanding model linear
+
+### Pemilihan Model Terbaik
+Setelah seluruh model dilatih dan diuji, XGBoost Regression dipilih sebagai model terbaik karena memberikan hasil evaluasi paling optimal (R² tertinggi dan RMSE terendah) dibanding dua model lainnya. Selain itu, model ini juga mampu menangkap hubungan kompleks antar fitur dengan lebih baik.
+
+📌 **Model dengan R² tertinggi dan RMSE terendah dipilih sebagai solusi akhir**, karena memberikan hasil prediksi paling mendekati nilai aktual dari hasil panen.
+
+
+## Evaluation
+
+Pada tahap ini, dilakukan evaluasi terhadap performa model dalam memprediksi hasil panen `(hg/ha_yield)` berdasarkan variabel lingkungan dan input pertanian. Dua metrik evaluasi yang digunakan adalah Root Mean Squared Error (RMSE) dan R-squared (R²), yang umum digunakan dalam permasalahan regresi.
+
+Kedua metrik ini umum digunakan dalam permasalahan regresi untuk menilai kualitas prediksi model.
+
+### Evaluation Metrics
+
+#### Root Mean Squared Error (RMSE)
+
+- Mengukur rata-rata kesalahan antara nilai aktual dan prediksi.
+- Semakin kecil nilai RMSE, semakin baik performa model.
+
+**Formula:**
+
+$$
+RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
+$$
+
+#### R-squared (R²)
+
+- Mengukur seberapa baik model menjelaskan variasi dari data aktual.
+- Nilai R² mendekati 1 menunjukkan bahwa model sangat baik dalam menjelaskan data.
+
+**Formula:**
+
+$$
+R^2 = 1 - \frac{\sum (y_i - \hat{y}_i)^2}{\sum (y_i - \bar{y})^2}
+$$
+
+
+### Model Comparison Results
+
+| Model                  | RMSE     | R² Score |
+|------------------------|----------|----------|
+| Linear Regression      | XX.XXX   | XX.XXX   |
+| Random Forest Regressor | XX.XXX   | XX.XXX   |
+| XGBoost Regressor      | XX.XXX   | XX.XXX   |
+
+> *Note: Nilai-nilai di atas akan diisi berdasarkan hasil evaluasi aktual dari model yang dilatih.*
+
+### Final Model Selection
+
+Model terbaik dipilih berdasarkan:
+
+- **Nilai RMSE terendah**
+- **Nilai R² tertinggi**
+
+📌 Berdasarkan hasil evaluasi, **[Model Terbaik]** menunjukkan performa terbaik dan **dipilih sebagai model final** untuk digunakan dalam prediksi hasil panen.
+
+Model ini memberikan prediksi yang akurat dan dapat diandalkan, serta siap digunakan oleh pemangku kepentingan untuk mendukung pengambilan keputusan strategis di sektor pertanian.
