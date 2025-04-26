@@ -223,6 +223,10 @@ Maka dari itu, kolom `Unnamed: 0` dihapus untuk merapikan dataset.
 df_clean = df.drop(columns=['Unnamed: 0'])
 ```
 
+📌 Alasan Penggunaan Teknik Ini:
+Menghapus nilai kosong (missing values) dipilih karena proporsi data yang hilang sangat kecil dan tidak memiliki pola spesifik, sehingga tidak berdampak signifikan terhadap distribusi data secara keseluruhan. Pendekatan ini menjaga integritas data tanpa menambahkan bias akibat imputasi yang tidak perlu, dan mempercepat proses pemodelan.
+
+
 #### Penanganan dilakukan dengan metode **Interquartile Range (IQR)**:
 ```python
       outlier_cols = df_clean[['pesticides_tonnes', 'avg_temp', 'hg/ha_yield']]
@@ -232,6 +236,10 @@ df_clean = df.drop(columns=['Unnamed: 0'])
 
       df_clean_ou = df_clean[~((outlier_cols < (Q1 - 1.5 * IQR)) | (outlier_cols > (Q3 + 1.5 * IQR))).any(axis=1)]
 ```
+
+📌 Alasan Penggunaan Teknik Ini:
+Metode Interquartile Range (IQR) dipilih karena bersifat robust terhadap nilai ekstrem dan tidak terpengaruh oleh distribusi data. Teknik ini efektif untuk mendeteksi dan menghapus outlier pada data numerik kontinu seperti pesticides_tonnes, avg_temp, dan hg/ha_yield, sehingga membantu meningkatkan stabilitas dan akurasi model regresi seperti Random Forest dan XGBoost yang sensitif terhadap noise dan outlier.
+
 
 ### 2. Encoding Variabel Kategorikal 
 
