@@ -223,7 +223,7 @@ Maka dari itu, kolom `Unnamed: 0` dihapus untuk merapikan dataset.
 df_clean = df.drop(columns=['Unnamed: 0'])
 ```
 
-### Penanganan dilakukan dengan metode **Interquartile Range (IQR)**:
+#### Penanganan dilakukan dengan metode **Interquartile Range (IQR)**:
 ```python
       outlier_cols = df_clean[['pesticides_tonnes', 'avg_temp', 'hg/ha_yield']]
       Q1 = outlier_cols.quantile(0.25)
@@ -279,7 +279,6 @@ PCA digunakan untuk mengurangi dimensi data tanpa kehilangan banyak informasi, s
 
 📌 Alasan Penggunaan Teknik ini:  
 Standarisasi digunakan karena fitur dengan skala yang lebih besar dapat mendominasi perhitungan. Dengan standarisasi, semua fitur diperlakukan secara setara dalam proses pembelajaran. PCA digunakan untuk menyederhanakan kompleksitas data, mempercepat waktu pelatihan, serta mengurangi risiko overfitting akibat terlalu banyak fitur.
-
 
 
 ## Modeling 
@@ -437,3 +436,25 @@ Sementara itu, XGBoost Regressor memiliki hasil yang stabil dengan RMSE dan R² 
 Dengan demikian, Linear Regression dipilih sebagai model terbaik berdasarkan kedekatannya dengan nilai sebenarnya pada prediksi tertentu, meskipun secara keseluruhan performa XGBoost lebih baik dalam hal kestabilan dan generalisasi terhadap data uji.
 
 Untuk pengembangan lebih lanjut, disarankan untuk melakukan penyetelan parameter (hyperparameter tuning) untuk lebih mengoptimalkan model. Teknik seperti Grid Search atau Bayesian Optimization dapat digunakan untuk mengeksplorasi konfigurasi parameter yang lebih baik, guna meningkatkan performa model secara keseluruhan.
+
+### Analisis Dampak Prediksi terhadap Permasalahan dan Tujuan
+
+Hasil evaluasi model menunjukkan bahwa pendekatan regresi yang diterapkan telah berhasil menjawab permasalahan yang dirumuskan pada tahap *Business Understanding*:
+
+1. **Problem Statement 1 – Ketidakpastian dalam prediksi hasil panen:**  
+   Model **XGBoost** memberikan performa yang stabil dengan nilai **RMSE sebesar 11,962.52** dan **R² sebesar 0.98**, yang menunjukkan kemampuannya dalam memproyeksikan hasil panen secara akurat berdasarkan data historis. Ini menjawab kebutuhan untuk meminimalkan ketidakpastian dalam perencanaan pertanian.
+
+2. **Problem Statement 2 – Identifikasi faktor dominan:**  
+   Model **Random Forest** dan **XGBoost** tidak hanya memberikan prediksi yang akurat, tetapi juga memungkinkan analisis kontribusi masing-masing fitur (*feature importance*). Hasil ini membantu dalam mengidentifikasi variabel yang paling berpengaruh terhadap hasil panen, mendukung efisiensi penggunaan sumber daya.
+
+Selain itu, hasil dari model **Linear Regression** juga memberikan wawasan yang penting dalam konteks pemahaman awal:
+- Meskipun memiliki performa keseluruhan yang lebih rendah (**RMSE: 54,258.52**; **R²: 0.59**) dan cenderung mengalami *underfitting*, model ini memiliki interpretabilitas yang tinggi.
+- Pada contoh data tertentu, model ini menghasilkan prediksi sebesar **68,915.5**, yang sangat dekat dengan nilai aktual **69,220**. Ini menunjukkan bahwa model linear masih relevan untuk kasus-kasus tertentu yang memiliki pola hubungan linier yang kuat antara fitur dan target.
+- Dengan demikian, Linear Regression tetap memberikan kontribusi awal yang penting dalam memahami struktur dasar hubungan antar variabel, sebelum melangkah ke model yang lebih kompleks.
+
+Proyek ini juga telah berhasil mencapai **goals** yang ditetapkan:
+- Model prediktif berhasil dibangun dan diuji menggunakan pendekatan *supervised regression*.
+- Evaluasi menggunakan metrik RMSE dan R² menunjukkan performa yang baik dan konsisten, khususnya pada model XGBoost.
+- Solusi seperti pemilihan model regresi dan penerapan *hyperparameter tuning* terbukti efektif dalam meningkatkan akurasi prediksi.
+
+Dengan demikian, solusi yang diusulkan tidak hanya berdampak positif terhadap performa model secara teknis, tetapi juga mendukung pengambilan keputusan yang lebih tepat di sektor pertanian, sejalan dengan tujuan bisnis proyek ini.
