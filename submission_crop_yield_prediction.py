@@ -29,14 +29,32 @@ from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
-"""# **2. Data Loading**"""
+"""# **2. Data Loading**
+
+### Mengunduh Dataset
+Pada langkah ini, kita mengunduh dataset dari Kaggle menggunakan fungsi `dataset_download` dari `kagglehub`. Dataset yang diunduh adalah dataset yang berjudul "crop-yield-prediction-dataset" yang berisi informasi terkait dengan prediksi hasil panen. Setelah proses pengunduhan selesai, path atau lokasi dari file dataset tersebut akan dicetak, yang bisa digunakan untuk memuat dan memanipulasi data lebih lanjut.
+
+Metode ini penting untuk mendapatkan dataset yang relevan untuk analisis dan pengembangan model prediksi hasil panen.
+"""
 
 # Download latest version
 path = kagglehub.dataset_download("mrigaankjaswal/crop-yield-prediction-dataset")
 
 print("Path to dataset files:", path)
 
+"""### Menampilkan Daftar File dalam Direktori
+Setelah dataset berhasil diunduh, kita menggunakan perintah `os.listdir(path)` untuk memverifikasi file apa saja yang ada di dalam direktori tempat dataset disimpan. Fungsi ini akan mengembalikan sebuah daftar yang berisi nama file dan folder yang ada dalam path tersebut. Hal ini penting untuk memastikan bahwa file dataset yang diunduh ada di lokasi yang tepat dan siap digunakan untuk proses selanjutnya, seperti pemuatan data dan eksplorasi.
+
+"""
+
 os.listdir(path)
+
+"""### Memuat Dataset ke dalam DataFrame
+Pada langkah ini, kita memuat file CSV bernama `yield_df.csv` yang terletak di direktori yang telah ditentukan sebelumnya (path) menggunakan fungsi `pd.read_csv()`. Fungsi ini akan membaca konten file CSV dan mengonversinya menjadi objek DataFrame dari `pandas`, yang memungkinkan kita untuk melakukan analisis dan manipulasi data lebih lanjut dengan mudah.
+
+Dataset ini berisi data terkait prediksi hasil panen, dan kita akan menggunakan DataFrame `df` untuk melakukan eksplorasi data lebih lanjut, termasuk pembersihan data, analisis, atau pengembangan model prediksi.
+
+"""
 
 df = pd.read_csv(os.path.join(path, "yield_df.csv"))
 df
@@ -44,56 +62,255 @@ df
 """# **3. Eksploratory Data Analysis**
 
 ## Mengecek Struktur Data
+
+### Menampilkan Informasi DataFrame
+Pada langkah ini, kita menggunakan metode `df.info()` untuk mendapatkan informasi umum tentang DataFrame yang berisi dataset yang telah dimuat. Metode ini memberikan informasi penting, seperti:
+- Jumlah total baris dan kolom dalam dataset.
+- Tipe data setiap kolom (misalnya `int64`, `float64`, `object`).
+- Jumlah nilai non-null (tidak kosong) untuk setiap kolom, yang membantu dalam mendeteksi apakah ada missing values atau tidak.
+
+Informasi ini sangat penting untuk tahap eksplorasi data, karena dapat memberi petunjuk awal mengenai kualitas data dan apakah ada kolom yang memerlukan penanganan lebih lanjut (seperti pengisian nilai kosong).
 """
 
 df.info()
 
+"""### Menampilkan Ringkasan Statistik Deskriptif
+Pada langkah ini, kita menggunakan metode `df.describe()` untuk menghasilkan ringkasan statistik deskriptif dari data numerik dalam dataset. Fungsi ini memberikan informasi yang sangat berguna untuk menganalisis distribusi data, seperti:
+- **count**: Jumlah nilai non-null (tidak kosong) pada setiap kolom.
+- **mean**: Rata-rata nilai pada setiap kolom.
+- **std**: Standar deviasi, yang mengukur variasi data.
+- **min**: Nilai minimum dalam setiap kolom.
+- **25%**: Kuartil pertama (25% data berada di bawah nilai ini).
+- **50% (median)**: Kuartil kedua (50% data berada di
+
+"""
+
 df.describe()
 
-"""Insight
+"""### Insight
+- Terdapat indikasi ada kolom yang tidak relevan dengan analisis nanti. akan dicek pada penanganan missing values.
+- Dataset menunjukkan adanya nilai ekstrim (outliers) pada kolom seperti hasil panen dan penggunaan pestisida. Hal ini perlu diperiksa lebih lanjut, karena outliers dapat memengaruhi hasil analisis atau pembuatan model prediksi jika tidak ditangani dengan tepat.
 - `hg/ha_yield` Nilai maksimum jauh lebih besar dari Q3 dan median → kemungkinan ada outlier di bagian atas.
 - `pesticides_tonnes` Max sangat jauh dari Q3 dan mean ada indikasi kuat outlier atau bisa jadi salah input atau terkendala dengan tahun dan area negara yang menerapkan kebijakan ketat tentang pestisida.
 - `avg_temp` Distribusi terlihat normal, tapi nilai minimum 1.3 °C cukup rendah untuk data rata-rata tahunan (kecuali ini dari negara seperti Greenland atau pegunungan tinggi). Perlu dicek datanya berasal dari mana (Area).
 
-## Menangani Missing Values
+## Mengecek Missing Values
+
+### Menghitung Missing Values
+Pada langkah ini, kita menggunakan metode `df.isnull().sum()` untuk menghitung jumlah nilai yang hilang (missing values) di setiap kolom dalam dataset. Fungsi `isnull()` memeriksa apakah setiap nilai di kolom tersebut adalah `null` atau kosong, dan `.sum()` menghitung total jumlah nilai kosong pada setiap kolom.
+
+Hasil dari perintah ini akan memberikan gambaran tentang kolom mana yang memiliki missing values dan seberapa besar jumlahnya. Ini penting karena missing values dapat mempengaruhi analisis dan model yang akan dibangun, dan perlu ditangani sebelum melanjutkan ke tahap berikutnya.
 """
 
 df.isnull().sum()
 
+"""### Mengecek Kolom Tidak Berguna
+Pada langkah ini, kita menemukan adanya kolom bernama `Unnamed: 0` yang berisi angka urut (index) yang tidak memiliki nilai informasi yang relevan untuk analisis. Kolom ini biasanya muncul jika dataset disimpan dengan indeks baris sebagai kolom dalam file CSV.
+
+Karena kolom ini tidak membawa informasi yang berguna, kita bisa menghapusnya untuk menjaga kebersihan data dan menghindari kebingungan saat analisis. Penghapusan kolom seperti ini adalah langkah umum dalam pembersihan data.
+
+"""
+
 df['Unnamed: 0']
+
+"""### Insight
+- Tidak ada nilai kosong (NaN/null) di semua kolom.
+- Terdapat kolom bernama Unnamed yang redundant, kolom ini hanya duplikasi dari index baris. Sudah seharusnya dihapus, karena tidak menambah informasi apa pun.
+
+## Mengecek Outlier
+
+### Menyaring Data dengan Penggunaan Pestisida yang Sangat Rendah
+Pada langkah ini, kita memfilter dataset untuk menampilkan hanya baris-baris yang memiliki nilai **0.04 ton** pada kolom `pesticides_tonnes`. Nilai ini sangat kecil dan bisa menunjukkan:
+- Daerah atau waktu yang memiliki penggunaan pestisida yang sangat rendah atau bahkan tidak signifikan.
+- Potensi data yang mungkin mencakup kesalahan input atau kondisi ekstrem.
+  
+Langkah ini penting untuk memeriksa apakah ada kasus yang perlu diinvestigasi lebih lanjut, terutama untuk menangani nilai ekstrem atau outliers dalam dataset.
+"""
+
+df[df['pesticides_tonnes'] == 0.04]
+
+"""### Menghitung Jumlah Baris dengan Penggunaan Pestisida Sangat Rendah
+Pada tahap ini, kita menghitung jumlah observasi dalam dataset `df_clean` di mana kolom `pesticides_tonnes` bernilai **0.04 ton**. Nilai ini dianggap sangat rendah dan dapat mengindikasikan:
+- Penggunaan pestisida yang sangat minim atau hampir tidak ada (mungkin praktik pertanian organik).
+- Potensi outlier atau anomali dalam data.
+
+Dengan menjumlahkan kondisi `df_clean.pesticides_tonnes == 0.04`, kita bisa mengetahui **berapa banyak kasus seperti ini terjadi** dalam dataset. Ini membantu dalam memahami distribusi data dan memutuskan apakah nilai-nilai tersebut perlu ditangani khusus.
+
+
+"""
+
+pestisida = (df.pesticides_tonnes == 0.04).sum()
+print(pestisida)
+
+"""### Menyaring Data Berdasarkan Suhu Rata-rata Terendah
+Pada tahap ini, kita memfilter data untuk menemukan baris dengan nilai suhu rata-rata (`avg_temp`) paling rendah, yaitu **1.3°C**. Nilai ini merupakan nilai **minimum** yang sebelumnya terlihat saat menjalankan `df.describe()`, sehingga penting untuk:
+- Memeriksa apakah nilai tersebut **masuk akal secara kontekstual** (misalnya, mungkin berasal dari negara dengan musim dingin ekstrem).
+- Atau justru nilai ini merupakan **anomali atau kesalahan data (outlier)** yang perlu ditangani, terutama jika tidak sesuai dengan wilayah pertanian umumnya.
+
+Langkah ini membantu kita memahami kualitas dan validitas data, terutama ketika nilai minimum tampak tidak wajar.
+
+"""
+
+df.loc[df['avg_temp'] == 1.3]
+
+"""### Visualisasi Distribusi Penggunaan Pestisida
+Pada tahap ini, kita menggunakan boxplot untuk melihat distribusi nilai pada kolom `pesticides_tonnes` `hg/ha_yield`, `avg_temp`. Boxplot berguna untuk:
+- Melihat **nilai tengah (median)**, **kuartil (Q1 dan Q3)**, serta **sebaran data**.
+- Mengidentifikasi **outlier** atau nilai-nilai ekstrem, yaitu titik-titik yang berada jauh di luar rentang normal data (biasanya lebih dari 1.5 IQR dari Q1 atau Q3).
+
+Dengan visualisasi ini, kita bisa memahami apakah data penggunaan pestisida memiliki **penyebaran yang normal atau miring**, serta apakah terdapat **banyak nilai ekstrem (outliers)** yang bisa memengaruhi analisis atau modeling.
+
+"""
+
+sns.boxplot(x=df['pesticides_tonnes'])
+
+sns.boxplot(x=df['hg/ha_yield'])
+
+sns.boxplot(x=df['avg_temp'])
+
+"""### Insight
+- Nilai minimum `pesticides_tonnes` adalah 0.04, sangat kecil dibandingkan Q1 (1702) hingga max (367,778). ini akan ditangani di outlier karena setelah di cek bukan karena kesalahan input yang menimbulkan missing values melainkan karena faktor negara dan tahun-tahun awal (1990-an) — wajar untuk masa itu (belum banyak pakai pestisida).
+- Distribusi suhu rata-rata menunjukkan keragaman iklim di dataset, dengan sebagian besar negara memiliki suhu 16–26°C, namun terdapat outlier dengan suhu ekstrem rendah (~1.3°C) seperti di Norwegia. Ini mengindikasikan bahwa data mencakup wilayah beriklim tropis hingga sangat dingin. `avg_temp` minimum untuk suhu rata-rata tahunan 1.3°C di Norway masih masuk akal karena negara Skandinavia yang dingin. ini akan dicek lebih lanjut pada penanganan outlier.
+- Hasil panen (hg/ha_yield) sangat bervariasi antar negara dan komoditas, dengan mayoritas hasil di bawah 200.000 hg/ha, namun banyak ditemukan outlier dengan produktivitas sangat tinggi, menandakan adanya ketimpangan hasil panen yang signifikan.
+
+## Univariate Analysis
+
+### Categorical Features
+
+##### Menentukan Fitur Kategorikal
+Langkah ini bertujuan untuk mengidentifikasi kolom-kolom dalam dataset `df_clean_ou` yang bertipe data **objek** (biasanya string), yang berarti mereka berisi data **kategorikal** (seperti nama negara, jenis tanaman, dsb).
+
+Metode `select_dtypes(include='object')` akan memilih semua kolom bertipe objek, lalu `.columns.tolist()` akan mengubahnya menjadi daftar nama kolom.
+Hasil ini disimpan dalam variabel `categorical_features`, yang kemudian bisa digunakan untuk keperluan seperti:
+- Encoding (misalnya: one-hot encoding)
+- Visualisasi distribusi kategori
+- Analisis data kategorikal secara spesifik
+"""
+
+categorical_features = df.select_dtypes(include='object').columns.tolist()
+
+categorical_features
+
+"""##### Visualisasi Jumlah dan Persentase Kategori pada Fitur
+Langkah ini digunakan untuk:
+1. Menghitung jumlah kemunculan (count) dari setiap kategori pada fitur pertama (contoh: 'country').
+2. Menghitung persentase distribusinya terhadap total data.
+3. Menampilkan hasilnya dalam bentuk DataFrame `count_percent` yang menunjukkan count dan persentase dari setiap kategori.
+4. Membuat visualisasi **horizontal bar chart** dari count tiap kategori.
+
+Visualisasi ini membantu untuk:
+- Mengetahui **kategori mana yang dominan** dalam data.
+- Mengenali **ketidakseimbangan kelas** yang mungkin penting dalam analisis
+
+"""
+
+feature = categorical_features[0]
+count = df[feature].value_counts()
+percent = 100 * df[feature].value_counts(normalize=True)
+count_percent = pd.DataFrame({'count': count, 'percent': percent.round(1)})
+print(count_percent)
+count.sort_values().plot(kind='barh', figsize=(10, 20), title=f'Count Distribution for {feature}')
+
+feature = categorical_features[1]
+count = df[feature].value_counts()
+percent = 100 * df[feature].value_counts(normalize=True)
+count_percent = pd.DataFrame({'count': count, 'percent': percent.round(1)})
+print(count_percent)
+count.plot(kind='bar', title=f'Count Distribution for {feature}')
+
+"""### Numerical Features
+
+##### Visualisasi Distribusi Fitur Numerik dengan Histogram
+Langkah ini digunakan untuk menampilkan histogram dari setiap kolom numerik dalam dataset `df_clean_ou`. Histogram ini memberikan gambaran visual tentang:
+- **Distribusi data** (normal, skewed, uniform, dll.)
+- **Penyebaran nilai** dari masing-masing fitur
+- Kemungkinan adanya **outliers** atau **nilai ekstrim**
+- Jumlah data dalam berbagai rentang nilai
+
+Parameter:
+- `bins=60` membagi rentang data menjadi 60 interval.
+- `figsize=(20, 15)` mengatur ukuran plot agar seluruh histogram dapat ditampilkan dengan jelas.
+"""
+
+df.hist(bins=60, figsize=(20, 15))
+plt.show()
+
+"""### Insight
+
+1. **Distribusi Negara (Area):**  
+   Mayoritas data berasal dari India (14.6%), diikuti Pakistan dan Mexico, sementara negara seperti Norwegia, Swedia, dan Belgia memiliki representasi data yang sangat kecil.
+
+2. **Distribusi Komoditas (Item):**  
+   Jagung (`Maize`), gandum (`Wheat`), dan padi (`Rice, paddy`) mendominasi dataset, sedangkan komoditas seperti `Plantains`, `Yams`, dan `Cassava` memiliki proporsi data yang jauh lebih kecil.
+
+3. **Distribusi Tahun (Year):**  
+   Data tersebar merata dari tahun 1990 hingga 2013 tanpa ada gap signifikan.
+
+4. **Distribusi Hasil dan Faktor Agrikultur:**  
+   - `hg/ha_yield` dan `pesticides_tonnes` menunjukkan distribusi miring ke kanan, menandakan banyak data di rentang rendah serta adanya outlier.
+   - `average_rain_fall_mm_per_year` memperlihatkan konsentrasi pada level curah hujan tertentu.
+
+5. **Distribusi Suhu Rata-rata (avg_temp):**  
+   Distribusi suhu membentuk pola bimodal, mengindikasikan adanya dua kelompok iklim utama di negara-negara dalam dataset.
+
+## Multivariate Analysis
+
+Analisis Visual Fitur Kategorikal terhadap Target (hg/ha_yield)
+"""
+
+cat_feature = df.select_dtypes(include='object').columns.tolist()
+for feature in cat_feature:
+    sns.catplot(x=feature, y='hg/ha_yield', data=df, kind='bar', height=4, aspect=3, palette='Set3')
+    plt.xticks(rotation=90)
+    plt.show()
+
+"""Visualisasi Hubungan Antar Variabel dengan Pairplot"""
+
+sns.pairplot(df)
+plt.show()
+
+"""Visualisasi Korelasi Fitur Numerik dengan Heatmap"""
+
+numerical_features = df.select_dtypes(include='number').columns.tolist()
+plt.figure(figsize=(10, 8))
+correlation_matrix = df[numerical_features].corr().round(2)
+
+sns.heatmap(data=correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5, )
+plt.title('Correlation Matrix for Numerical Features', size=15)
+
+df.head()
+
+"""### Insight
+
+1. **Korelasi Antar Fitur Numerik:**  
+   Korelasi antar fitur numerik umumnya lemah; korelasi tertinggi hanya 0.32 antara `avg_temp` dan `average_rain_fall_mm_per_year`.
+
+2. **Hubungan Target dengan Fitur Lain:**  
+   `hg/ha_yield` memiliki korelasi sangat rendah terhadap semua fitur numerik, menunjukkan hubungan non-linear.
+
+3. **Pengaruh Area terhadap Yield:**  
+   Negara seperti India, Pakistan, dan Indonesia memiliki jumlah data besar, namun rata-rata hasil panen berbeda-beda.
+
+4. **Pengaruh Item terhadap Yield:**  
+   Komoditas seperti Maize, Wheat, dan Rice mendominasi data dengan variasi hasil panen yang terlihat jelas.
+
+# **4. Data Preparation**
+
+## Menangani Missing Values dan Outlier
+
+### Menghapus Kolom yang Tidak Relevan
+Pada tahap ini, kolom `Unnamed: 0` dihapus karena tidak membawa informasi penting untuk analisis. Kolom tersebut biasanya merupakan indeks yang dimasukkan sebagai kolom saat dataset diekspor.
+- Setelah dihapus, dataset menjadi lebih bersih dan hanya berisi kolom-kolom yang relevan untuk analisis lebih lanjut.
+- Dataset yang telah dibersihkan disimpan dalam DataFrame baru `df_clean`, sehingga DataFrame asli (`df`) tetap utuh.
+"""
 
 df_clean = df.drop(columns=['Unnamed: 0'])
 df_clean
 
-df_clean[df_clean['pesticides_tonnes'] == 0.04]
+"""### Mengidentifikasi dan Menghapus Outliers
+Langkah ini mengidentifikasi dan menghapus **outliers** dari dataset berdasarkan **Interquartile Range (IQR)**, yang adalah metode yang umum digunakan untuk mendeteksi data yang ekstrem.
 
-pestisida = (df_clean.pesticides_tonnes == 0.04).sum()
-print(pestisida)
-
-df_clean.loc[df_clean['avg_temp'] == 1.3]
-
-df_clean.shape
-
-"""Insight
-- Tidak ada nilai kosong (NaN/null) di semua kolom.
-- Terdapat kolom bernama Unnamed yang redundant, kolom ini hanya duplikasi dari index baris. Sudah seharusnya dihapus, karena tidak menambah informasi apa pun.
-- Nilai minimum `pesticides_tonnes` adalah 0.04, sangat kecil dibandingkan Q1 (1702) hingga max (367,778). ini akan ditangani di outlier karena setelah di cek bukan karena kesalahan input yang menimbulkan missing values melainkan karena faktor negara dan tahun-tahun awal (1990-an) — wajar untuk masa itu (belum banyak pakai pestisida).
-- `avg_temp` minimum untuk suhu rata-rata tahunan 1.3°C di Norway masih masuk akal karena negara Skandinavia yang dingin. ini akan dicek lebih lanjut pada penanganan outlier.
-- Bisa langsung lanjut ke eksplorasi data, visualisasi, dan modeling tanpa
-hambatan karena missing value.
-
-## Menangangi Outlier
-
-Boxplot untuk Mendeteksi Outlier pada Fitur
 """
-
-sns.boxplot(x=df_clean['pesticides_tonnes'])
-
-sns.boxplot(x=df_clean['hg/ha_yield'])
-
-sns.boxplot(x=df_clean['avg_temp'])
-
-"""Menghapus Outlier Menggunakan Metode IQR (Interquartile Range)"""
 
 outlier_cols = df_clean[['pesticides_tonnes', 'avg_temp', 'hg/ha_yield']]
 Q1 = outlier_cols.quantile(0.25)
@@ -102,80 +319,39 @@ IQR = Q3 - Q1
 
 df_clean_ou = df_clean[~((outlier_cols < (Q1 - 1.5 * IQR)) |(outlier_cols > (Q3 + 1.5 * IQR))).any(axis=1)]
 
+"""### Mengevaluasi Dataset Setelah Penghapusan Outlier
+
+Setelah menghapus outlier, kita melakukan beberapa pemeriksaan untuk memastikan data bersih dan siap untuk analisis lebih lanjut:
+
+1. **`df_clean_ou.shape`**: Menampilkan dimensi dataset setelah penghapusan outlier (jumlah baris dan kolom).
+2. **`df_clean_ou.info()`**: Memberikan informasi mengenai tipe data dan jumlah nilai non-null di setiap kolom.
+3. **`df_clean_ou.describe()`**: Menyajikan statistik deskriptif untuk kolom numerik, seperti rata-rata, standar deviasi, nilai minimum, dan kuartil.
+
+Langkah ini memastikan bahwa dataset sudah bersih dari outlier dan tidak memiliki missing values, serta memberikan gambaran distribusi data.
+"""
+
 df_clean_ou.shape
 
 df_clean_ou.info()
 
 df_clean_ou.describe()
 
-"""Insight
-- Nilai outlier sudah diatasi dengan menggunakan metode IQR, terlihat pada tabel descriptive statisticnya sudah terlihat lebih baik nilai outliernya dibanding sebelumnya.
-
-## Univariate Analysis
-
-### Categorical Features
-"""
-
-categorical_features = df_clean_ou.select_dtypes(include='object').columns.tolist()
-
-categorical_features
-
-"""##### Visualisasi Jumlah dan Persentase Kategori pada Fitur"""
-
-feature = categorical_features[0]
-count = df_clean_ou[feature].value_counts()
-percent = 100 * df_clean_ou[feature].value_counts(normalize=True)
-count_percent = pd.DataFrame({'count': count, 'percent': percent.round(1)})
-print(count_percent)
-count.sort_values().plot(kind='barh', figsize=(10, 20), title=f'Count Distribution for {feature}')
-
-feature = categorical_features[1]
-count = df_clean_ou[feature].value_counts()
-percent = 100 * df_clean_ou[feature].value_counts(normalize=True)
-count_percent = pd.DataFrame({'count': count, 'percent': percent.round(1)})
-print(count_percent)
-count.plot(kind='bar', title=f'Count Distribution for {feature}')
-
-"""### Numerical Features
-
-Visualisasi Distribusi Fitur dengan Histogram
-"""
-
-df_clean_ou.hist(bins=60, figsize=(20, 15))
-plt.show()
-
-"""### Multivariate Analysis
-
-Analisis Visual Fitur Kategorikal terhadap Target (hg/ha_yield)
-"""
-
-cat_feature = df_clean_ou.select_dtypes(include='object').columns.tolist()
-for feature in cat_feature:
-    sns.catplot(x=feature, y='hg/ha_yield', data=df_clean_ou, kind='bar', height=4, aspect=3, palette='Set3')
-    plt.xticks(rotation=90)
-    plt.show()
-
-"""Visualisasi Hubungan Antar Variabel dengan Pairplot"""
-
-sns.pairplot(df_clean_ou)
-plt.show()
-
-"""Visualisasi Korelasi Fitur Numerik dengan Heatmap"""
-
-numerical_features = df_clean_ou.select_dtypes(include='number').columns.tolist()
-plt.figure(figsize=(10, 8))
-correlation_matrix = df_clean_ou[numerical_features].corr().round(2)
-
-sns.heatmap(data=correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5, )
-plt.title('Correlation Matrix for Numerical Features', size=15)
-
-df_clean_ou.head()
-
-"""# **4. Data Preparation**
+"""### Insight
+- Kolom unnamed telah di drop
+- **Outlier dalam kolom `pesticides_tonnes`, `avg_temp`, dan `hg/ha_yield`** telah dihapus.
+- Dataset yang bersih dari outlier disimpan dalam `df_clean_ou`, yang siap untuk analisis atau modeling lebih lanjut.
 
 ## Encoding fitur kategori
 
 ### OneHot Encoding
+Pada langkah ini, kita melakukan **one-hot encoding** untuk kolom-kolom kategorikal dalam dataset `df_clean_ou`:
+
+1. **Identifikasi Kolom Kategorikal**:
+   - Menggunakan `select_dtypes(include='object')`, kita mengidentifikasi kolom-kolom dengan tipe data kategorikal (`object`).
+
+2. **One-Hot Encoding**:
+   - Menggunakan `pd.get_dummies()`, kita mengubah kolom-kolom kategorikal tersebut menjadi representasi numerik dengan membuat kolom baru untuk setiap kategori yang ada.
+   - Setiap kategori diubah menjadi kolom biner (0 atau 1), yang menunjukkan apakah suatu baris memiliki kategori tersebut.
 """
 
 cat_columns = df_clean_ou.select_dtypes(include='object').columns.tolist()
@@ -184,7 +360,10 @@ df_onehot_encoded = pd.get_dummies(df, columns=cat_columns)
 
 df_onehot_encoded
 
-"""## Splitting Data
+"""### Insight
+- Hasilnya adalah DataFrame baru, `df_onehot_encoded`, yang telah berisi representasi numerik dari fitur kategorikal, siap untuk digunakan dalam analisis atau model machine learning.
+
+## Splitting Data
 
 Menentukan Variabel Fitur dan Target
 """
@@ -201,7 +380,17 @@ print("Ukuran label latih:", y_train.shape)
 print("Ukuran data uji:", X_test.shape)
 print("Ukuran label uji:", y_test.shape)
 
-"""## Reduksi PCA dan Standarisasi
+"""### Insight
+
+1. **Pembagian Data Latih dan Uji**:
+   - Dataset dibagi menjadi **22,593 baris untuk data latih** dan **5,649 baris untuk data uji**. Dengan demikian, data latih mencakup sekitar **80%** dari total dataset, sementara data uji mencakup **20%**. Pembagian ini adalah strategi umum yang memungkinkan model untuk dilatih dengan cukup data dan diuji pada data yang belum pernah dilihat sebelumnya.
+
+2. **Keseimbangan dan Evaluasi Model**:
+   - Terdapat **116 fitur** dalam kedua data latih dan uji, memberikan model banyak informasi untuk dipelajari. Dengan ukuran data latih yang besar, model dapat mempelajari pola dengan lebih baik. Sementara itu, data uji yang terpisah memberikan evaluasi yang objektif tentang bagaimana model dapat menggeneralisasi pada data baru, yang sangat penting untuk mengukur kinerja model di dunia nyata.
+
+## Reduksi PCA dan Standarisasi
+
+PCA digunakan untuk **reduksi dimensi** dengan tujuan untuk mempertahankan sebagian besar variansi dalam data. Teknik ini mengubah data ke dalam ruang fitur yang lebih kecil dengan mengurangi jumlah fitur, sambil tetap mempertahankan informasi yang paling penting untuk analisis atau pemodelan lebih lanjut. Reduksi dimensi ini membantu dalam **mempercepat perhitungan** dan **mengurangi kompleksitas model**.
 
 Normalisasi Data Menggunakan StandardScaler pada Data Train dan Test
 """
@@ -220,9 +409,31 @@ print("Dimensi asli:", X_train.shape[1])
 print("Dimensi setelah PCA:", X_train_pca.shape[1])
 print("Total variansi terjaga:", np.sum(pca.explained_variance_ratio_))
 
-"""# 5. **Model Development**
+"""### Insight
+
+1. **Pengurangan Dimensi**:
+   - Dimensi awal dataset adalah **116 fitur**, dan setelah diterapkan **PCA**, dimensi dataset dikurangi menjadi **98 fitur**. Ini menunjukkan bahwa sebagian besar informasi dari data dapat dijelaskan dengan lebih sedikit fitur, yang membuat model lebih efisien dan mengurangi risiko overfitting.
+
+2. **Total Variansi Terjaga**:
+   - **97% variansi** dari data asli berhasil dijaga dengan hanya menggunakan 98 komponen utama. Artinya, meskipun dimensi data berkurang, hampir seluruh informasi penting tetap terjaga, yang membuat model lebih sederhana namun tetap akurat.
+
+# 5. **Model Development**
 
 ## Linear Regression
+
+### Inisialisasi dan Latih Model Linear Regression
+Pada tahap ini, kita melakukan inisialisasi model Linear Regression, melatih model menggunakan data training yang telah direduksi dimensinya dengan PCA, kemudian memprediksi hasil pada data testing.  
+Selanjutnya, dilakukan evaluasi performa model menggunakan metrik RMSE dan R² Score untuk mengetahui seberapa baik model dalam memprediksi data.
+
+- **Proses**:  
+  - Membuat model Linear Regression.
+  - Melatih model dengan data training (X_train_pca, y_train).
+  - Melakukan prediksi pada data testing (X_test_pca).
+  - Mengukur performa model menggunakan RMSE dan R² Score.
+
+- **Hasil**:  
+  - Nilai RMSE memberikan informasi seberapa besar rata-rata error prediksi.
+  - Nilai R² Score menunjukkan seberapa besar variasi data target dapat dijelaskan oleh model.
 """
 
 # Inisialisasi model
@@ -242,7 +453,31 @@ print("Linear Regression Performance:")
 print(f"RMSE: {rmse:.2f}")
 print(f"R² Score: {r2:.2f}")
 
-"""## Random Forest Regressor"""
+"""### Insight dari Hasil Evaluasi Model Linear Regression
+
+1. **RMSE (Root Mean Squared Error) = 54,258.52**  
+   Nilai RMSE yang cukup besar ini menunjukkan bahwa model sering kali melakukan kesalahan yang signifikan dalam memprediksi nilai target. Ini mengindikasikan bahwa model perlu ditingkatkan, mungkin dengan menangani outlier atau mencoba teknik lain untuk mengurangi kesalahan prediksi.
+
+2. **R² Score = 0.59**  
+   Dengan R² yang sebesar 0.59, model Linear Regression dapat menjelaskan sekitar 59% dari variasi data target, yang menunjukkan bahwa model ini belum sepenuhnya optimal. Masih ada 41% variasi yang tidak dapat dijelaskan, sehingga perlu ada perbaikan, seperti memilih fitur yang lebih relevan atau mencoba model yang lebih kompleks untuk meningkatkan performa.
+
+## Random Forest Regressor
+
+### Inisialisasi Model Random Forest
+Pada tahap ini, kita melakukan inisialisasi model Random Forest Regressor dengan jumlah 5 pohon keputusan (n_estimators=5) dan random_state untuk memastikan hasil yang konsisten.  
+Model kemudian dilatih menggunakan data training yang telah direduksi dimensinya dengan PCA, diikuti dengan prediksi pada data testing.  
+Evaluasi performa model dilakukan menggunakan metrik RMSE dan R² Score.
+
+- **Proses**:  
+  - Membuat model Random Forest Regressor.
+  - Melatih model menggunakan data training (X_train_pca, y_train).
+  - Melakukan prediksi pada data testing (X_test_pca).
+  - Menghitung performa model menggunakan RMSE dan R² Score.
+
+- **Hasil**:  
+  - RMSE menunjukkan rata-rata kesalahan prediksi model.
+  - R² Score menunjukkan proporsi variasi target yang dapat dijelaskan oleh model Random Forest.
+"""
 
 # Inisialisasi model
 rf_model = RandomForestRegressor(n_estimators=5, random_state=42)
@@ -261,7 +496,39 @@ print("Random Forest Performance:")
 print(f"RMSE: {rmse_rf:.2f}")
 print(f"R² Score: {r2_rf:.2f}")
 
-"""## Extreme Gradient Boosting"""
+"""### Insight dari Hasil Evaluasi Model Random Forest
+
+- **RMSE (Root Mean Squared Error)**: **9,548.54**  
+  Nilai RMSE yang cukup rendah ini menunjukkan bahwa model cukup akurat dalam memprediksi data uji, dengan kesalahan rata-rata prediksi yang relatif kecil.
+   
+- **R² Score**: **0.99**  
+Nilai R² yang sangat tinggi ini menunjukkan bahwa model mampu menjelaskan 99% variasi dalam data target, yang berarti model ini sangat baik dalam memprediksi target pada data uji.
+
+## Extreme Gradient Boosting
+
+### Inisialisasi dan Pelatihan Model XGBoost Regressor
+
+Pada tahap ini, kita menginisialisasi model XGBoost Regressor dengan beberapa parameter penting seperti:
+- `objective='reg:squarederror'` untuk tugas regresi.
+- `n_estimators=100` jumlah pohon yang digunakan.
+- `learning_rate=0.1` menentukan seberapa besar kontribusi setiap pohon baru.
+- `max_depth=6` untuk membatasi kedalaman setiap pohon.
+- `random_state=42` untuk hasil yang konsisten.
+- `n_jobs=-1` untuk menggunakan semua core CPU agar pelatihan lebih cepat.
+
+Model kemudian dilatih menggunakan data training yang telah direduksi dimensinya dengan PCA, dilanjutkan dengan prediksi pada data testing.  
+Evaluasi performa model dilakukan menggunakan metrik RMSE dan R² Score.
+
+- **Proses**:
+  - Membuat model XGBoost Regressor dengan parameter yang ditentukan.
+  - Melatih model menggunakan data training (X_train_pca, y_train).
+  - Melakukan prediksi pada data testing (X_test_pca).
+  - Menghitung performa model menggunakan RMSE dan R² Score.
+
+- **Hasil**:
+  - RMSE memberikan informasi tentang rata-rata kesalahan prediksi model.
+  - R² Score menunjukkan seberapa besar variasi data target yang dapat dijelaskan oleh model XGBoost.
+"""
 
 # Inisialisasi model
 xgb_model = XGBRegressor(
@@ -287,9 +554,27 @@ print("XGBoost Regression Performance:")
 print(f" RMSE : {rmse_xgb:.2f}")
 print(f" R²   : {r2_xgb:.2f}")
 
-"""# **6. Evaluasi Model**
+"""### Insight dari Hasil Evaluasi Model XGBost
+   - **RMSE (Root Mean Squared Error)**: **11,962.52**  
+     Nilai RMSE ini menunjukkan bahwa model memiliki kesalahan rata-rata prediksi yang lebih tinggi dibandingkan model Random Forest. Ini mengindikasikan bahwa prediksi model mungkin sedikit lebih jauh dari nilai sesungguhnya.
+   
+   - **R² Score**: **0.98**  
+     Dengan nilai R² yang tinggi ini, model mampu menjelaskan 98% variasi dalam data target. Ini menunjukkan bahwa meskipun RMSE sedikit lebih besar, model XGBoost masih sangat baik dalam memprediksi data target.
+
+# **6. Evaluasi Model**
 
 ### Menghitung MSE (Mean Squared Error) untuk Data Train dan Test pada Masing-Masing Algoritma
+
+Pada tahap ini, kita membuat perbandingan performa antara ketiga model (Linear Regression, Random Forest, dan XGBoost) berdasarkan nilai Mean Squared Error (MSE) pada data training dan data testing.
+
+- **Proses**:
+  - Membuat sebuah DataFrame kosong bernama `mse` untuk menyimpan nilai MSE dari masing-masing model.
+  - Membuat dictionary `model_dict` untuk mengasosiasikan nama model dengan objek modelnya.
+  - Menghitung nilai MSE untuk data training dan testing pada setiap model, lalu membaginya dengan 1000 (1e3) untuk memperkecil skala nilai.
+  - Menyimpan hasil perhitungan ke dalam DataFrame `mse`.
+
+- **Hasil**:
+  - Didapatkan tabel berisi nilai MSE pada data training dan testing untuk masing-masing model, yang dapat digunakan untuk membandingkan seberapa baik kinerja setiap model.
 """
 
 # Buat variabel mse yang isinya adalah dataframe nilai mse data train dan test pada masing-masing algoritma
@@ -310,7 +595,35 @@ fig, ax = plt.subplots()
 mse.sort_values(by='test', ascending=False).plot(kind='barh', ax=ax, zorder=3)
 ax.grid(zorder=0)
 
-"""### Prediksi Menggunakan Model pada Data Uji (Test Data) untuk Evaluasi"""
+"""### **Insight dari Hasil Perbandingan**
+1. **Linear Regression (LR) memiliki nilai MSE yang sangat besar** dibandingkan model lainnya, baik pada data training maupun testing.  
+   - Hal ini menunjukkan bahwa model **kurang mampu menangkap pola hubungan** dalam data dengan baik, sehingga menghasilkan error yang sangat tinggi.
+   - Kemungkinan besar, model ini **underfitting**, yaitu terlalu sederhana untuk dataset yang digunakan.
+
+2. **Random Forest (RF) memiliki performa terbaik berdasarkan nilai MSE yang paling rendah**, terutama pada data training.  
+   - Dengan nilai **MSE train = 20,567.55** dan **MSE test = 91,174.55**, model ini menunjukkan bahwa ia mampu mempelajari pola dalam data dengan baik.
+   - Namun, terdapat **gap antara nilai MSE train dan test**, yang mungkin mengindikasikan model sedikit **overfitting** terhadap data training.
+
+3. **XGBoost (Boosting) memiliki nilai MSE yang lebih tinggi dibanding Random Forest, tetapi masih jauh lebih baik dibanding Linear Regression**.  
+   - Nilai **MSE train = 94,251.84** dan **MSE test = 143,101.78** menunjukkan bahwa model ini masih cukup baik dalam memprediksi data, meskipun tidak sebaik Random Forest.
+   - Kemungkinan model ini masih bisa ditingkatkan performanya dengan **optimasi hyperparameter**.
+
+### Prediksi Menggunakan Model pada Data Uji (Test Data) untuk Evaluasi
+
+## Membuat Prediksi untuk 1 Sampel Data dan Membandingkan Hasilnya
+
+Pada tahap ini, kita mengambil 1 sampel dari data testing (setelah PCA) dan melakukan prediksi menggunakan ketiga model yang telah dilatih (Linear Regression, Random Forest, dan XGBoost).  
+Hasil prediksi tersebut kemudian dibandingkan dengan nilai target sebenarnya (y_true).
+
+- **Proses**:
+  - Menyalin satu data dari `X_test_pca` untuk dijadikan sampel prediksi.
+  - Membuat dictionary `pred_dict` untuk menyimpan nilai aktual (`y_true`) dan hasil prediksi dari setiap model.
+  - Melakukan prediksi pada sampel menggunakan semua model dalam `model_dict`, hasil prediksi dibulatkan hingga 1 angka desimal.
+  - Menampilkan hasil prediksi dalam bentuk DataFrame.
+
+- **Hasil**:
+  - Didapatkan tabel yang memperlihatkan nilai target asli dan hasil prediksi dari masing-masing model, yang dapat digunakan untuk membandingkan akurasi prediksi secara individual.
+"""
 
 prediksi = X_test_pca[:1].copy()
 pred_dict = {'y_true':y_test[:1]}
@@ -318,3 +631,35 @@ for name, model in model_dict.items():
     pred_dict['prediksi_'+name] = model.predict(prediksi).round(1)
 
 pd.DataFrame(pred_dict)
+
+"""### Insight dan Kesimpulan Berdasarkan Prediksi Model
+
+Berdasarkan hasil prediksi yang diberikan untuk data **y_true**, **prediksi_LR**, **prediksi_RF**, dan **prediksi_Boosting**, berikut adalah insight yang dapat diambil:
+
+#### 1. **Prediksi Linear Regression (LR)**
+   - **Prediksi LR**: 68,915.5  
+     Prediksi model Linear Regression sangat dekat dengan nilai asli (`y_true = 69,220`), dengan selisih hanya sekitar **304.5**. Ini menunjukkan bahwa model Linear Regression memberikan prediksi yang sangat akurat untuk data ini.
+
+#### 2. **Prediksi Random Forest (RF)**
+   - **Prediksi RF**: 71,228.0  
+     Prediksi model Random Forest sedikit lebih tinggi daripada nilai asli, dengan selisih sekitar **3,008**. Meskipun cukup dekat, perbedaan ini lebih besar dibandingkan dengan model Linear Regression.
+
+#### 3. **Prediksi XGBoost (Boosting)**
+   - **Prediksi Boosting**: 76,691.3  
+     Prediksi model XGBoost lebih jauh dari nilai asli, dengan selisih sekitar **7,471.3**. Ini menunjukkan bahwa model Boosting cenderung menghasilkan prediksi yang lebih jauh dari nilai yang sebenarnya.
+
+---
+
+### Kesimpulan
+
+- **Model Linear Regression (LR)** memberikan hasil prediksi yang paling mendekati nilai sebenarnya (y_true = 69,220), dengan kesalahan terkecil dibandingkan model lainnya. Ini menunjukkan bahwa untuk data ini, **Linear Regression** lebih akurat dalam memprediksi target dibandingkan dengan model Random Forest (RF) dan XGBoost (Boosting).
+  
+- **Model Random Forest (RF)** memberikan hasil yang lebih jauh dari nilai asli, namun masih dalam rentang yang wajar. Prediksi ini sedikit lebih besar dibandingkan dengan model Linear Regression.
+
+- **Model Boosting (XGBoost)** memberikan prediksi yang cukup jauh dari nilai asli, yang menunjukkan bahwa meskipun XGBoost dapat sangat efektif dalam banyak kasus, untuk dataset ini ia tidak lebih baik daripada model Linear Regression.
+
+### Rekomendasi
+
+- **Linear Regression (LR)** adalah pilihan terbaik untuk data ini karena memberikan hasil yang lebih akurat dengan selisih yang lebih kecil. Meskipun model ini relatif sederhana, hasilnya sangat baik untuk kasus ini.
+
+"""
