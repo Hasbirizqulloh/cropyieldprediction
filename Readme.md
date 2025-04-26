@@ -114,26 +114,14 @@ Memahami setiap fitur dalam dataset, baik yang kategorikal maupun numerik. Ini t
     - Variabel Area dan Item adalah kategorikal dan perlu dilakukan encoding sebelum digunakan dalam model.
     - Variable Year, hg/ha_yield, average_rain_fall_mm_per_year, pesticides_tonnes, dan avg_temp merupakan variable numerik.
     
-#### 2. Menangani Missing Value dan Outliers
+#### 2. Mengecek Missing Value dan Outliers
    - Missing Values  
-Mengidentifikasi apakah ada data yang hilang pada setiap kolom dan menentukan apakah akan menghapus atau menggantinya menggunakan teknik imputation. Pada tahap ini hasilnya tidak ditemukan adanya nilai kosong (NaN/null) di seluruh kolom dataset, sehingga tidak perlu dilakukan imputasi atau penghapusan data karena masalah nilai hilang dan hanya terdapat kolom bernama Unnamed, yang merupakan duplikasi dari index baris. Kolom ini tidak memberikan informasi tambahan dan telah dihapus.
+Mengidentifikasi apakah ada data yang hilang pada setiap kolom dan menentukan apakah akan menghapus atau menggantinya menggunakan teknik imputation. Pada tahap ini hasilnya tidak ditemukan adanya nilai kosong (NaN/null) di seluruh kolom dataset, sehingga tidak perlu dilakukan imputasi atau penghapusan data karena masalah nilai hilang dan hanya terdapat kolom bernama Unnamed, yang merupakan duplikasi dari index baris.
    - Outliers  
 Mendeteksi outliers yang dapat memengaruhi hasil analisis dan model. Pada tahap ini outliers terdeteksi pada tiga variabel utama berdasarkan hasil statistik deskriptif, yaitu:
       - `hg/ha_yield`: Nilai maksimum mencapai 501,412, jauh di atas Q3 (104,676.75).
       - `avg_temp`: Nilai minimum avg_temp sebesar 1.3°C setelah dianalisis ternyata berasal dari Norway, dan masih dianggap wajar mengingat iklim negara tersebut yang dingin tapi harus tetap ditangani nilai outliernya.
       - `pesticides_tonnes`: Rentang nilai dari 0.04 hingga 367,778 ton. Nilai minimum berasal dari tahun-tahun awal di beberapa negara dan dianggap valid, meskipun secara statistik tergolong ekstrem.
-        
-      Penanganan dilakukan dengan metode **Interquartile Range (IQR)**:
-     ```python
-      outlier_cols = df_clean[['pesticides_tonnes', 'avg_temp', 'hg/ha_yield']]
-      Q1 = outlier_cols.quantile(0.25)
-      Q3 = outlier_cols.quantile(0.75)
-      IQR = Q3 - Q1
-
-      df_clean_ou = df_clean[~((outlier_cols < (Q1 - 1.5 * IQR)) | (outlier_cols > (Q3 + 1.5 * IQR))).any(axis=1)]
-     ```
-     Dataset df_clean_ou merupakan hasil dari proses ini, yang telah disaring dari nilai outlier untuk ketiga fitur tersebut. Dataset ini akan digunakan untuk proses analisis dan modeling lebih lanjut.
-
 
 #### 3. Univariate Analysis  
 Menganalisis distribusi setiap variabel secara terpisah menggunakan visualisasi seperti histogram atau boxplot. Hal ini membantu memahami pola data dan mendeteksi ketidakseimbangan atau distribusi yang tidak normal, terutama pada variabel target (hg/ha_yield).
@@ -176,7 +164,7 @@ Distribusi kategori dianalisis menggunakan metode value counts dan visualisasi b
 - Fitur Numerikal
 Distribusi fitur numerik divisualisasikan menggunakan histogram dengan 60 bin:
 
-![Histograms of Numerical Features](./Images/download.png)
+![Deskripsi Gambar](https://drive.google.com/uc?export=view&id=1yEYoBgLccEnGnS-QtnvgVxodLvTCW6_Q)
 
           Fitur yang dianalisis:
 
@@ -202,7 +190,7 @@ Menganalisis hubungan antara fitur-fitur dalam dataset menggunakan scatter plot,
     
       - 📈 **Korelasi tertinggi** tercatat antara `avg_temp` dan `average_rain_fall_mm_per_year` dengan nilai **0.32**, yang masih tergolong korelasi lemah.
       - 🎯 **Target utama** `hg/ha_yield` memiliki korelasi **sangat lemah terhadap semua variabel numerik lainnya**, yang menandakan bahwa hubungan antara hasil panen dan fitur lingkungan tidak bersifat linear sederhana.
-      ![heatmap correlation](./Images/Image.png)
+      ![Deskripsi Gambar](https://drive.google.com/uc?export=view&id=1uRB9Y37fgV2vr5mP5mBuDVI43jpPMdjr)
 
   - Relasi Variabel Kategorikal dan Target  
     Visualisasi distribusi rata-rata hasil panen (`hg/ha_yield`) berdasarkan variabel kategorikal `Area` dan `Item`:
@@ -222,7 +210,30 @@ Langkah-langkah eksplorasi ini memberikan wawasan awal yang penting sebagai dasa
 ## Data Preparation
 Pada tahap ini, dilakukan serangkaian proses **data preparation** untuk memastikan data siap digunakan dalam pemodelan machine learning. Proses dilakukan secara bertahap dan sistematis sesuai urutan sebagai berikut:
 
-### 1. Encoding Variabel Kategorikal 
+### 1. Menangani Missing Values dan Outlier
+Pada tahap ini, dilakukan dua proses utama dalam pembersihan data:
+
+#### Menghapus Kolom Tidak Berguna:
+Berdasarkan hasil Exploratory Data Analysis (EDA), ditemukan bahwa kolom `Unnamed: 0` tidak memiliki kontribusi informasi penting terhadap analisis.  
+Kolom ini biasanya muncul akibat kesalahan saat menyimpan file CSV (karena `index` ikut tersimpan).  
+Maka dari itu, kolom `Unnamed: 0` dihapus untuk merapikan dataset.
+
+```python
+# Menghapus kolom Unnamed: 0 yang tidak berguna
+df_clean = df.drop(columns=['Unnamed: 0'])
+```
+
+### Penanganan dilakukan dengan metode **Interquartile Range (IQR)**:
+```python
+      outlier_cols = df_clean[['pesticides_tonnes', 'avg_temp', 'hg/ha_yield']]
+      Q1 = outlier_cols.quantile(0.25)
+      Q3 = outlier_cols.quantile(0.75)
+      IQR = Q3 - Q1
+
+      df_clean_ou = df_clean[~((outlier_cols < (Q1 - 1.5 * IQR)) | (outlier_cols > (Q3 + 1.5 * IQR))).any(axis=1)]
+```
+
+### 2. Encoding Variabel Kategorikal 
 
 Fitur kategorikal seperti `Area` dan `Item` dikonversi menjadi format numerik menggunakan **One-Hot Encoding**.
 
@@ -234,7 +245,7 @@ Variabel kategorikal seperti Area dan Item tidak dapat digunakan secara langsung
 📌 Alasan Penggunaan Teknik ini:  
 One-hot encoding menjaga informasi kategori tanpa memaksakan urutan atau bobot numerik tertentu, sehingga lebih cocok untuk algoritma yang sensitif terhadap skala data seperti XGBoost dan PCA.
 
-### 2. Pembagian Data (Splitting)
+### 3. Pembagian Data (Splitting)
 Data dibagi menjadi data pelatihan dan pengujian dengan rasio 80:20 menggunakan train_test_split dari Scikit-Learn.
 
 ```python
@@ -246,7 +257,7 @@ Tujuan dari pembagian ini adalah untuk menguji performa model pada data yang bel
 📌 Alasan Penggunaan Teknik ini:  
 Pembagian ini penting untuk memastikan bahwa model dapat dievaluasi dengan data yang tidak pernah dilihat sebelumnya (data uji), sehingga hasil evaluasi lebih objektif dan realistis.
 
-### 3.  Standarisasi dan Reduksi Dimensi dengan PCA 
+### 4.  Standarisasi dan Reduksi Dimensi dengan PCA 
 
 Sebelum melakukan reduksi dimensi dengan PCA, dilakukan proses standarisasi terhadap fitur numerik. Ini penting karena PCA bekerja berdasarkan variansi antar fitur, dan fitur dengan skala lebih besar akan mendominasi hasil jika tidak dinormalisasi terlebih dahulu.
 
